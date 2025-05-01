@@ -9,7 +9,7 @@ export class CharacterUpdateHandler
 {
   private readonly characterRepository = new CharacterRepository();
 
-  async handle(character: Partial<Character>): Promise<void> {
+  async handle(character: Character): Promise<void> {
     return this.characterRepository.update(character._id, character);
   }
 }

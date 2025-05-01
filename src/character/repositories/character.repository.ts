@@ -11,7 +11,7 @@ export class CharacterRepository {
     await db.collection<Character>(this.COLLECTION_NAME).insertOne(character);
   }
 
-  async update(id: ObjectId, character: Partial<Character>): Promise<void> {
+  async update(id: ObjectId, character: Character): Promise<void> {
     const db = await getDbInstance();
     await db
       .collection<Character>(this.COLLECTION_NAME)

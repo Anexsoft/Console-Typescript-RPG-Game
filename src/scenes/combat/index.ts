@@ -8,8 +8,8 @@ import { GameState } from '@game/engine/game.state';
 import { SceneHandler } from '@game/scenes/scene.interface';
 
 import { CharacterLevelProgressHandler } from '@game/character/handlers/character-level-progress.handler';
-import { CharacterRestoreHandler } from '@game/character/handlers/character-restore.handler';
 import { CharacterUpdateHandler } from '@game/character/handlers/character-update.handler';
+import { CharacterUpgradeHandler } from '@game/character/handlers/character-upgrade.handler';
 
 import { Enemy } from '@game/npc/enemy';
 import { EnemyType } from '@game/npc/enemy/enemies.enum';
@@ -33,14 +33,11 @@ type EnemyStrength = 'weak' | 'strongest';
 
 export class CombatScene implements SceneHandler {
   private readonly enemyCreateHandler = new EnemyCreateHandler();
-
   private readonly enemyFightHandler = new EnemyFightHandler();
 
   private readonly characterLevelProgressHandler =
     new CharacterLevelProgressHandler();
-
-  private readonly characterRestoreHandler = new CharacterRestoreHandler();
-
+  private readonly characterUpgradeHandler = new CharacterUpgradeHandler();
   private readonly characterUpdateHandler = new CharacterUpdateHandler();
 
   async handle({ place }: CombatSceneInput): Promise<void> {
@@ -58,9 +55,9 @@ export class CombatScene implements SceneHandler {
 
     const report = this.fight(character, enemy);
 
-    await this.updatePlayerProgress(character, report.expPointsEarned);
-
     await this.printLogs(report, character, enemy);
+
+    await this.updatePlayerProgress(character, report.expPointsEarned);
 
     GameManager.changeScene(GameManagerSceneName.TownScene);
   }
@@ -177,9 +174,36 @@ export class CombatScene implements SceneHandler {
         message: `🎉 ¡Has alcanzado el nivel ${newLevel}!`,
       });
 
-      this.characterRestoreHandler.handle(character);
+      await this.improvePlayerAttributes(character);
     }
 
     await this.characterUpdateHandler.handle(character);
+  }
+
+  private async improvePlayerAttributes(character: Character): Promise<void> {
+    const statChoices = [
+      { name: 'STR (Fuerza)', value: 'str' },
+      { name: 'VIT (Vitalidad)', value: 'vit' },
+      { name: 'INT (Inteligencia)', value: 'int' },
+      { name: 'DEX (Destreza)', value: 'dex' },
+      { name: 'LUK (Suerte)', value: 'luk' },
+    ];
+
+    const availablePoints = 20;
+
+    for (let i = 0; i < availablePoints; i++) {
+      const stat = await Dialoguer.send<'str' | 'vit' | 'int' | 'dex' | 'luk'>({
+        who: DialoguerType.PLAYER,
+        message: `Elige un atributo para mejorar (${i + 1}/${availablePoints}):`,
+        options: {
+          type: 'list',
+          choices: statChoices,
+        },
+      });
+
+      character[stat]++;
+    }
+
+    this.characterUpgradeHandler.handle(character);
   }
 }

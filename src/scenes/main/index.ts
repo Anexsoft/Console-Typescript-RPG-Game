@@ -10,12 +10,11 @@ import { SceneHandler } from '@game/scenes/scene.interface';
 
 import { CharacterCreateHandler } from '@game/character/handlers/character-create.handler';
 import { CharacterGetHandler } from '@game/character/handlers/character-get.handler';
-import { CharacterStatsProgressHandler } from '@game/character/handlers/character-stats-progress.handler';
+import { CharacterUpgradeHandler } from '@game/character/handlers/character-upgrade.handler';
 
 export class MainScene implements SceneHandler {
   private readonly characterCreateHandler = new CharacterCreateHandler();
-  private readonly characterStatsProgressHandler =
-    new CharacterStatsProgressHandler();
+  private readonly characterUpgradeHandler = new CharacterUpgradeHandler();
   private readonly characterGetHandler = new CharacterGetHandler();
 
   async handle(): Promise<void> {
@@ -88,7 +87,7 @@ export class MainScene implements SceneHandler {
   async createNewCharacter(name: string): Promise<void> {
     const character = new Character(name);
 
-    this.characterStatsProgressHandler.handle(character);
+    this.characterUpgradeHandler.handle(character);
     await this.characterCreateHandler.handle(character);
 
     GameState.setCharacter(character);
