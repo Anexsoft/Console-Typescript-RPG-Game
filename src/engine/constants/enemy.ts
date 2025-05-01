@@ -1,0 +1,1 @@
+export const ENEMY_STAT_FACTOR_PER_LEVEL = 0.25;

@@ -1,0 +1,37 @@
+# Node dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+lib/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# VSCode settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package archives
+*.tgz
+
+# Husky internal folder (optional)
+.husky/_/

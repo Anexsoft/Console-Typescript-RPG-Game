@@ -1,0 +1,16 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaries": ["en", "es-es"],
+  "import": ["@cspell/dict-es-es/cspell-ext.json"],
+  "words": ["Promt", "Dialoguer", "GOBLINGS", "Gólems", "Prompt"],
+  "flagWords": [],
+  "ignorePaths": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "CHANGELOG.md",
+    "README.md",
+    "docker/**"
+  ]
+}

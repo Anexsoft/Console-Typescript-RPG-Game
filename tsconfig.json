@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    /* Target ECMAScript version */
+    "target": "ES2021",
+
+    /* Module system for Node.js compatibility */
+    "module": "commonjs",
+
+    /* Base directory for non-relative module imports */
+    "baseUrl": "./",
+
+    /* Path alias mapping */
+    "paths": {
+      "@game/*": ["src/*"]
+    },
+
+    /* Output directory for compiled files */
+    "outDir": "./dist",
+
+    /* Enable source maps for debugging */
+    "sourceMap": true,
+
+    /* Remove comments from output files */
+    "removeComments": true,
+
+    /* Resolve JSON modules */
+    "resolveJsonModule": true,
+
+    /* Enable incremental builds for faster compilation */
+    "incremental": true,
+
+    /* Skip type checking of declaration files for speed */
+    "skipLibCheck": true,
+
+    /* Generate declaration files (.d.ts) */
+    "declaration": true,
+
+    /* Enable decorators support */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Allow default imports from modules with no default export */
+    "allowSyntheticDefaultImports": true,
+
+    "esModuleInterop": true
+  }
+}
