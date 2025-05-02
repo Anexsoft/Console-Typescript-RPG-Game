@@ -136,6 +136,7 @@ export class Dialoguer {
       blue: chalk.blue,
       cyan: chalk.cyan,
       magenta: chalk.magenta,
+      grey: chalk.grey,
     };
 
     text = text.replace(/\[c:(\w+)\](.*?)\[\/\]/g, (_, colorKey, content) => {
