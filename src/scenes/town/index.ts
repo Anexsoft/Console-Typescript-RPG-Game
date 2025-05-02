@@ -52,7 +52,8 @@ export class TownScene implements SceneHandler {
   async changeToCombatSceneOnSelectedPlace(): Promise<void> {
     const place = await Dialoguer.send<TownSceneAction>({
       who: DialoguerType.GAME,
-      message: 'Haz decidido salir a cazar, tengo cuidado donde vayas.',
+      message:
+        'Haz decidido salir a cazar, siempre con cuidado donde vayas ...',
       options: {
         type: 'select',
         choices: [

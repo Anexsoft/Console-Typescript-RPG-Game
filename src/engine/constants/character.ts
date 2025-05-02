@@ -16,6 +16,8 @@ export const DMG_PER_STR = 0.5;
 export const CTR_PER_LUK = 0.0025; // 0.25% per LUK
 export const EVA_PER_DEX = 0.0025; // 0.25% per DEX
 
+export const STATS_AVAILABLE_PER_LEVEL = 3;
+
 export const CHARACTER_LEVEL = {
   1: [0, 50],
   2: [51, 100],

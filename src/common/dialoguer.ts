@@ -1,12 +1,4 @@
-import {
-  bold,
-  yellow,
-  red,
-  white,
-  cyanBright,
-  redBright,
-  magentaBright,
-} from 'chalk';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { GameState } from '@game/engine/game.state';
@@ -76,8 +68,8 @@ export class Dialoguer {
     level: DialoguerLevel = DialoguerLevel.INFO,
     nameOverride?: string,
   ): string {
-    const tag = Dialoguer.formatTag(who, nameOverride);
-    const coloredMessage = Dialoguer.colorize(message, level);
+    const tag = this.formatTag(who, nameOverride);
+    const coloredMessage = this.colorize(this.parseStyledTags(message), level);
 
     return `${tag}: ${coloredMessage}`;
   }
@@ -85,12 +77,12 @@ export class Dialoguer {
   private static colorize(message: string, level: DialoguerLevel): string {
     switch (level) {
       case DialoguerLevel.WARNING:
-        return yellow(message);
+        return chalk.yellow(message);
       case DialoguerLevel.ERROR:
-        return red(message);
+        return chalk.red(message);
       case DialoguerLevel.INFO:
       default:
-        return white(message);
+        return chalk.white(message);
     }
   }
 
@@ -99,15 +91,15 @@ export class Dialoguer {
 
     switch (who) {
       case DialoguerType.GAME:
-        return bold(magentaBright(label));
+        return chalk.bold(chalk.magentaBright(label));
       case DialoguerType.PLAYER:
-        return bold(
-          cyanBright(nameOverride ?? GameState.character.name ?? label),
+        return chalk.bold(
+          chalk.cyanBright(nameOverride ?? GameState.character.name ?? label),
         );
       case DialoguerType.ENEMY:
-        return bold(redBright(nameOverride ?? label));
+        return chalk.bold(chalk.redBright(nameOverride ?? label));
       default:
-        return bold(white(label));
+        return chalk.bold(chalk.white(label));
     }
   }
 
@@ -133,5 +125,24 @@ export class Dialoguer {
         choices: options?.choices,
       } as DialoguerPromtTypeList;
     }
+  }
+
+  private static parseStyledTags(text: string): string {
+    // Colors: [c:green]text[/]
+    const colorMap: Record<string, (txt: string) => string> = {
+      yellow: chalk.yellow,
+      red: chalk.red,
+      green: chalk.green,
+      blue: chalk.blue,
+      cyan: chalk.cyan,
+      magenta: chalk.magenta,
+    };
+
+    text = text.replace(/\[c:(\w+)\](.*?)\[\/\]/g, (_, colorKey, content) => {
+      const fn = colorMap[colorKey];
+      return typeof fn === 'function' ? fn(content) : content;
+    });
+
+    return text;
   }
 }

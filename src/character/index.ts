@@ -10,19 +10,19 @@ export class Character {
   name: string;
 
   /** Strength – affects physical damage. Higher strength means more power. */
-  str: number;
+  str: number = STR;
 
   /** Vitality – affects HP. The higher the value, the more life the character has. */
-  vit: number;
+  vit: number = VIT;
 
   /** Intelligence – affects MP. Determines how much mana the character can use. */
-  int: number;
+  int: number = INT;
 
   /** Dexterity – affects evasion. Higher dex increases the chance to dodge attacks. */
-  dex: number;
+  dex: number = DEX;
 
   /** Luck – affects critical rate. More luck increases critical hit chance. */
-  luk: number;
+  luk: number = LUK;
 
   /** Character level – used to scale base stats over time. Starts at 1. */
   level: number = 1;
@@ -30,44 +30,31 @@ export class Character {
   /** Current experience – used to determine level progression. Starts at 0. */
   exp: number = 0;
 
+  /** Gold – character's currency. Starts at 0. */
+  gold: number = 0;
+
   /** Current HP – actual life points. Can be reduced or restored during gameplay. */
-  hp: number;
+  hp: number = 0;
 
   /** Current MP – actual mana points. Used for skills or magic. */
-  mp: number;
+  mp: number = 0;
 
   /** Max HP – calculated from vitality and level. Used to limit current HP. */
-  maxHp: number;
+  maxHp: number = 0;
 
   /** Max MP – calculated from intelligence and level. Used to limit current MP. */
-  maxMp: number;
+  maxMp: number = 0;
 
   /** Evasion rate – chance to dodge an attack, based on dexterity (as a proportion). */
-  eva: number;
+  eva: number = 0;
 
   /** Critical rate – chance to land a critical hit, based on luck (as a proportion). */
-  ctr: number;
+  ctr: number = 0;
 
   /** Physical damage – calculated from strength (STR). */
-  dmg: number;
+  dmg: number = 0;
 
   constructor(name: string) {
     this.name = name;
-
-    this.str = STR;
-    this.vit = VIT;
-    this.int = INT;
-    this.dex = DEX;
-    this.luk = LUK;
-
-    this.level = 1;
-    this.exp = 0;
-    this.maxHp = 0;
-    this.maxMp = 0;
-    this.hp = 0;
-    this.mp = 0;
-    this.eva = 0;
-    this.ctr = 0;
-    this.dmg = 0;
   }
 }
