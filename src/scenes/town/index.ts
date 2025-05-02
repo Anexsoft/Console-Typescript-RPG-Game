@@ -55,11 +55,11 @@ export class TownScene implements SceneHandler {
         type: 'select',
         choices: [
           {
-            name: 'Bosque de GOBLINs (lvl >1)',
+            name: 'Bosque de Goblins (lvl >1)',
             value: CombatPlace.GOBLINGS_FOREST,
           },
           {
-            name: 'Bosque de GOBLINs (lvl >30)',
+            name: 'Bosque de Golems (lvl >30)',
             value: CombatPlace.GOLEM_FOREST,
           },
           {

@@ -1,54 +1,56 @@
-export const GAME_TEXTS = {
+export const GAME_TEXTS_EN = {
   /* GAME */
   GAME_STATS_CHOOSE:
-    'elige un atributo para mejorar ([c:grey]{{index}}[/]/{{availableStats}}',
+    'choose an attribute to improve ([c:grey]{{index}}[/]/{{availableStats}})',
 
   /* COMBAT */
   COMBAT_EVADE:
-    'intenta atacar, pero [c:magenta]{{defenderName}}[/] esquiva el golpe.',
+    'tries to strike, but [c:magenta]{{defenderName}}[/] swiftly dodges the attack.',
   COMBAT_ATTACK:
-    'ataca a [c:magenta]{{defenderName}}[/], infligiendo [c:red]{{dmg}} de daño[/]. Vida restante de {{defenderName}}: [c:grey]{{hp}}[/]',
+    'attacks [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]. remaining hp: [c:grey]{{hp}}[/]',
   COMBAT_ATTACK_CRIT:
-    'ataca a [c:magenta]{{defenderName}}[/], infligiendo [c:red]{{dmg}} de daño[/] crítico. Vida restante de {{defenderName}}: [c:grey]{{hp}}[/]',
+    'lands a [c:red]critical hit[/] on [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]! remaining hp: [c:grey]{{hp}}[/]',
   COMBAT_WIN:
-    '¡Has ganado el combate y obtuviste [c:green]{{expPointsEarned}} puntos de experiencia[/]!',
-  COMBAT_WIN_GOLD: 'también ganaste [c:yellow]{{goldEarned}} monedas de oro[/]',
-  COMBAT_LOSE:
-    'has perdido este combate. Prepárate más y vuelve a intentarlo !!',
+    'you defeated the enemy and earned [c:green]{{expPointsEarned}} experience points[/]!',
+  COMBAT_WIN_GOLD:
+    'you also found [c:yellow]{{goldEarned}} gold coins[/] on the battlefield.',
+  COMBAT_LOSE: 'you were defeated in battle. train harder and try again!',
 
-  COMBAT_ENEMY_APPEAR: '⚔️ ¡{{enemyName}} salvaje ha aparecido!',
+  COMBAT_ENEMY_APPEAR: '⚔️ a wild {{enemyName}} appears, ready to fight!',
 
   /* CHARACTER */
-  CHARACTER_STATUS: 'Nivel: {{level}} - HP: {{hp}}, MP: {{mp}}, EXP: {{exp}}',
+  CHARACTER_STATUS: 'level: {{level}} - hp: {{hp}}, mp: {{mp}}, exp: {{exp}}',
 
-  CHARACTER_NEW_LEVEL_REACHED: '🎉 ¡Has alcanzado el nivel {{newLevel}}!',
+  CHARACTER_NEW_LEVEL_REACHED:
+    '🎉 you leveled up! you are now level {{newLevel}}.',
 
   /* ENEMY */
   ENEMY_STATUS:
-    'Nivel: {{level}}, HP: {{hp}}, Daño: {{dmg}}, Evasión: {{eva}}%, Crítico: {{ctr}}%',
+    'level: {{level}}, hp: {{hp}}, damage: {{dmg}}, evasion: {{eva}}%, crit chance: {{ctr}}%',
 
   /* SCENE > MAIN */
-  MAIN_WELCOME: '🌟 Bienvenido a tu RPG por consola 🌟',
+  MAIN_WELCOME: '🌟 welcome to your console rpg adventure 🌟',
   MAIN_WELCOME_INTRO:
-    'Comenzamos la aventura en un oscuro castillo... El viento sopla con fuerza y la luna brilla intensamente.',
-  MAIN_CHARACTER_NAME: 'ingresa el nombre de tu personaje:',
-  MAIN_CHARACTER_CREATION: 'se ha creado tu personaje {{characterName}}',
+    'you awaken in a dark castle... the wind howls and the moon lights the sky.',
+  MAIN_CHARACTER_NAME: 'what is the name of your character?',
+  MAIN_CHARACTER_CREATION: 'your character {{characterName}} has been created.',
   MAIN_CHARACTER_WELCOME_BACK:
-    '🎮 Bienvenido de nuevo, {{characterName}}! Tu aventura continúa...',
+    '🎮 welcome back, {{characterName}}! your journey continues...',
 
   /* SCENE > TOWN */
-  TOWN_WHAT_TO_DO: 'te encuentras en el pueblo principal. ¿Qué deseas hacer?',
-  TOWN_GO_TO_INN: 'te diriges a descansar ...',
-  TOWN_GO_TO_STORE: 'te diriges a a la tienda ...',
-  TOWN_GO_TO_TAVERN: 'te diriges a la taverna ...',
-  TOWN_GO_TO_HUNT: 'te diriges a cazar, ve con cuidado ...',
+  TOWN_WHAT_TO_DO: 'you are in the main town. what would you like to do?',
+  TOWN_GO_TO_INN: 'you head toward the inn to rest...',
+  TOWN_GO_TO_STORE: 'you walk toward the store to check supplies...',
+  TOWN_GO_TO_TAVERN: 'you enter the tavern, the smell of ale in the air...',
+  TOWN_GO_TO_HUNT: 'you prepare for a hunt. stay alert...',
 
   /* SCENE > TOWN > INN */
-  TOWN_INN_RESTED:
-    'haz dormido bien y te encuentras [c:cyan]recuperado de energía[/]',
+  TOWN_INN_RESTED: 'you slept peacefully and feel [c:cyan]fully restored[/].',
 
   /* SCENE > COMBAT */
-  FOREST_ENTERING_GOBLINGS: 'llegaste al Bosque de Goblins.',
-  FOREST_ENTERING_GOLEM: 'llegaste al Bosque de Gólems.',
-  FOREST_ENTERING_DRAGON: 'llegaste al Bosque de Dragones.',
+  FOREST_ENTERING_GOBLINGS: 'you enter the goblin forest. danger lurks ahead.',
+  FOREST_ENTERING_GOLEM:
+    'you step into the forest of golems. heavy footsteps echo in the distance.',
+  FOREST_ENTERING_DRAGON:
+    'you tread into the dragon’s domain. the air feels heavier...',
 };
