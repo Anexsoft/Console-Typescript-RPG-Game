@@ -8,6 +8,11 @@ import {
   SceneHandler,
 } from '@game/scenes';
 
+import { template } from '@game/common/template';
+
+import { GAME_TEXTS } from './constants/texts';
+import { GAME_TEXTS_TYPES } from './types/texts.types';
+
 export enum GameManagerSceneName {
   MainScene,
   TownScene,
@@ -38,5 +43,9 @@ export class GameManager {
 
   static changeScene<Input>(name: GameManagerSceneName, param?: Input): void {
     this.scenes[name].handle(param);
+  }
+
+  static getMessage<T>(type: GAME_TEXTS_TYPES, params?: T): string {
+    return template(GAME_TEXTS[type], params);
   }
 }

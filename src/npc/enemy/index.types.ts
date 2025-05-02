@@ -1,4 +1,4 @@
-export type EnemyBase = {
+export type EnemyConfig = {
   name: string;
   level: number[];
   maxHp: number[];
@@ -6,8 +6,9 @@ export type EnemyBase = {
   eva: number[];
   ctr: number[];
   expGiven: number[];
+  goldGiven: number[];
 };
 
 export type EnemyTypesConfig = {
-  [enemyType: string]: EnemyBase;
+  [enemyType: string]: EnemyConfig;
 };

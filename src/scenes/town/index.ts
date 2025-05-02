@@ -17,7 +17,7 @@ export class TownScene implements SceneHandler {
   async handle(): Promise<void> {
     const action = await Dialoguer.send<TownSceneAction>({
       who: DialoguerType.GAME,
-      message: 'Te encuentras en el pueblo principal. ¿Qué deseas hacer?',
+      message: GameManager.getMessage('TOWN_WHAT_TO_DO'),
       options: {
         type: 'select',
         choices: [
@@ -39,26 +39,32 @@ export class TownScene implements SceneHandler {
   getActionMessage(action: TownSceneAction): string {
     switch (action) {
       case TownSceneAction.INN:
-        return 'Te diriges a descansar ...';
+        return GameManager.getMessage('TOWN_GO_TO_INN');
       case TownSceneAction.STORE:
-        return 'Te diriges a la tienda ...';
+        return GameManager.getMessage('TOWN_GO_TO_STORE');
       case TownSceneAction.TAVERN:
-        return 'Te diriges a la taberna ...';
-      default:
-        return 'Acción desconocida.';
+        return GameManager.getMessage('TOWN_GO_TO_TAVERN');
     }
   }
 
   async changeToCombatSceneOnSelectedPlace(): Promise<void> {
     const place = await Dialoguer.send<TownSceneAction>({
       who: DialoguerType.GAME,
-      message: 'Haz decidido salir a cazar, tengo cuidado donde vayas.',
+      message: GameManager.getMessage('TOWN_GO_TO_HUNT'),
       options: {
         type: 'select',
         choices: [
           {
-            name: 'Bosque de GOBLINs (lvl <10)',
+            name: 'Bosque de Goblins (lvl >1)',
             value: CombatPlace.GOBLINGS_FOREST,
+          },
+          {
+            name: 'Bosque de Golems (lvl >30)',
+            value: CombatPlace.GOLEM_FOREST,
+          },
+          {
+            name: 'Bosque de Dragones (lvl >50)',
+            value: CombatPlace.DRAGON_FOREST,
           },
         ],
       },

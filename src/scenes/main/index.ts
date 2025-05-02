@@ -5,6 +5,10 @@ import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
 
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
 import { GameState } from '@game/engine/game.state';
+import {
+  MainCharacterCreationMessageText,
+  MainCharacterWelcomeBackMessageText,
+} from '@game/engine/types/texts.types';
 
 import { SceneHandler } from '@game/scenes/scene.interface';
 
@@ -21,13 +25,16 @@ export class MainScene implements SceneHandler {
     const defaultName = DEFAULT_CHARACTER_NAME;
 
     if (defaultName) {
-      const existing = await this.findCharacter(defaultName);
-      if (existing) {
-        GameState.setCharacter(existing);
+      const character = await this.findCharacter(defaultName);
+      if (character) {
+        GameState.setCharacter(character);
 
         await Dialoguer.send({
           who: DialoguerType.GAME,
-          message: `🎮 Bienvenido de nuevo, ${existing.name}! Tu aventura continúa...`,
+          message: GameManager.getMessage<MainCharacterWelcomeBackMessageText>(
+            'MAIN_CHARACTER_WELCOME_BACK',
+            { characterName: character.name },
+          ),
         });
 
         GameManager.changeScene(GameManagerSceneName.TownScene);
@@ -52,24 +59,19 @@ export class MainScene implements SceneHandler {
   async welcomeMessageDialog(): Promise<void> {
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message: '🌟 Bienvenido a tu RPG por consola 🌟',
+      message: GameManager.getMessage('MAIN_WELCOME'),
     });
 
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message: 'Comenzamos la aventura en un oscuro castillo...',
-    });
-
-    await Dialoguer.send({
-      who: DialoguerType.GAME,
-      message: 'El viento sopla con fuerza y la luna brilla intensamente.',
+      message: GameManager.getMessage('MAIN_WELCOME_INTRO'),
     });
   }
 
   async enterCharacterUsername(): Promise<string> {
     const characterName = await Dialoguer.send<string>({
       who: DialoguerType.GAME,
-      message: 'Ingresa el nombre de tu personaje:',
+      message: GameManager.getMessage('MAIN_CHARACTER_NAME'),
       options: {
         validate: (input: string): boolean | string => {
           return input.trim() !== '' || 'El nombre no puede estar vacío.';
@@ -94,7 +96,10 @@ export class MainScene implements SceneHandler {
 
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message: `Se ha creado el personaje llamado ${character.name}`,
+      message: GameManager.getMessage<MainCharacterCreationMessageText>(
+        'MAIN_CHARACTER_CREATION',
+        { characterName: character.name },
+      ),
     });
   }
 }

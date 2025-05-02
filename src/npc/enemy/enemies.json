@@ -6,7 +6,8 @@
     "dmg": [4, 7],
     "eva": [10, 20],
     "ctr": [5, 10],
-    "expGiven": [10, 20]
+    "expGiven": [10, 20],
+    "goldGiven": [5, 10]
   },
   "GOLEM": {
     "name": "Golem",
@@ -15,7 +16,8 @@
     "dmg": [12, 18],
     "eva": [2, 5],
     "ctr": [3, 6],
-    "expGiven": [30, 50]
+    "expGiven": [30, 50],
+    "goldGiven": [50, 80]
   },
   "DRAGON": {
     "name": "Dragon",
@@ -24,6 +26,7 @@
     "dmg": [25, 40],
     "eva": [8, 15],
     "ctr": [12, 20],
-    "expGiven": [150, 250]
+    "expGiven": [150, 250],
+    "goldGiven": [200, 350]
   }
 }

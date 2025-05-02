@@ -27,18 +27,30 @@ export class EnemyCreateHandler
 
     const level = this.pickValue(enemyBase.level, power);
 
-    const maxHp = this.scaleStat(this.pickValue(enemyBase.maxHp, power), level);
-    const dmg = this.scaleStat(this.pickValue(enemyBase.dmg, power), level);
+    const maxHp = this.scaleValue(
+      this.pickValue(enemyBase.maxHp, power),
+      level,
+    );
+
+    const dmg = this.scaleValue(this.pickValue(enemyBase.dmg, power), level);
+
     const eva = Math.min(
-      this.scaleStat(this.pickValue(enemyBase.eva, power), level),
+      this.scaleValue(this.pickValue(enemyBase.eva, power), level),
       25,
     );
+
     const ctr = Math.min(
-      this.scaleStat(this.pickValue(enemyBase.ctr, power), level),
+      this.scaleValue(this.pickValue(enemyBase.ctr, power), level),
       50,
     );
-    const expGiven = this.scaleStat(
+
+    const expGiven = this.scaleValue(
       this.pickValue(enemyBase.expGiven, power),
+      level,
+    );
+
+    const goldGiven = this.scaleValue(
+      this.pickValue(enemyBase.goldGiven, power),
       level,
     );
 
@@ -49,18 +61,28 @@ export class EnemyCreateHandler
       eva,
       ctr,
       expGiven,
+      goldGiven,
     });
   }
 
   private pickValue(range: number[], power: EnemyStrength): number {
-    if (power === 'weak') return range[0];
-    if (power === 'strongest') return range[range.length - 1];
+    if (power === 'weak') {
+      return range[0];
+    }
+
+    if (power === 'strongest') {
+      return range[range.length - 1];
+    }
+
     const index = Math.floor(Math.random() * range.length);
     return range[index];
   }
 
-  private scaleStat(baseValue: number, level: number): number {
-    if (level <= 1) return baseValue;
+  private scaleValue(baseValue: number, level: number): number {
+    if (level <= 1) {
+      return baseValue;
+    }
+
     const factor = 1 + (level - 1) * ENEMY_STAT_FACTOR_PER_LEVEL;
     return Math.floor(baseValue * factor);
   }

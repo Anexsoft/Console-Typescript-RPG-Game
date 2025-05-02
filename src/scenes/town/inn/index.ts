@@ -15,7 +15,7 @@ export class InnScene implements SceneHandler {
   async handle(): Promise<void> {
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message: 'Haz dormido bien y te encuentras recuperado de energía',
+      message: GameManager.getMessage('TOWN_INN_RESTED'),
     });
 
     const character = GameState.character;

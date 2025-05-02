@@ -2,12 +2,20 @@ import { Character } from '@game/character';
 
 import { DialoguerType } from '@game/common/dialoguer';
 
+import { GameManager } from '@game/engine/game.manager';
+import {
+  CombatAttackCritMessageText,
+  CombatAttackMessageText,
+  CombatEvadeMessageText,
+} from '@game/engine/types/texts.types';
+
 import { Enemy } from '@game/npc/enemy';
 import { EnemyHandler } from '@game/npc/enemy/handlers/enemy.interfaces';
 
 export type FightReport = {
   winner: 'character' | 'enemy';
   expPointsEarned: number;
+  goldEarned: number;
   logs: FightReportLog[];
 };
 
@@ -16,17 +24,17 @@ type FightReportLog = {
   message: string;
 };
 
-type EnemyFightHandlerInput = {
+type CombatHandlerInput = {
   character: Character;
   enemy: Enemy;
 };
 
 type Owner = 'enemy' | 'character';
 
-export class EnemyFightHandler
-  implements EnemyHandler<EnemyFightHandlerInput, FightReport>
+export class CombatHandler
+  implements EnemyHandler<CombatHandlerInput, FightReport>
 {
-  handle({ character, enemy }: EnemyFightHandlerInput): FightReport {
+  handle({ character, enemy }: CombatHandlerInput): FightReport {
     const logs: FightReportLog[] = [];
 
     while (character.hp > 0 && enemy.isAlive()) {
@@ -40,9 +48,16 @@ export class EnemyFightHandler
     }
 
     const winner = character.hp > 0 ? 'character' : 'enemy';
-    const expPointsEarned = winner === 'character' ? enemy.expGiven : 0;
 
-    return { winner, expPointsEarned, logs };
+    let expPointsEarned = 0;
+    let goldEarned = 0;
+
+    if (winner === 'character') {
+      expPointsEarned = enemy.expGiven;
+      goldEarned = enemy.goldGiven;
+    }
+
+    return { winner, expPointsEarned, goldEarned, logs };
   }
 
   private executeTurn(
@@ -57,7 +72,7 @@ export class EnemyFightHandler
     if (this.didEvade(defender)) {
       logs.push({
         who: dialoguerType,
-        message: `intenta atacar, pero ${defender.name} esquiva el golpe.`,
+        message: this.getEvadeMessage(defender),
       });
 
       return;
@@ -65,7 +80,9 @@ export class EnemyFightHandler
 
     const isCrit = this.didCrit(attacker, type);
     let damage = attacker.dmg;
-    if (isCrit) damage *= 2;
+    if (isCrit) {
+      damage *= 2;
+    }
 
     if (defender instanceof Enemy) {
       defender.takeDamage(damage);
@@ -75,7 +92,36 @@ export class EnemyFightHandler
 
     logs.push({
       who: dialoguerType,
-      message: `ataca a ${defender.name} causando ${Math.floor(damage)} de daño.${isCrit ? ' ¡Golpe crítico!' : ''} Vida restante: ${defender.hp}.`,
+      message: this.getAttackMessage(defender, damage, isCrit),
+    });
+  }
+
+  private getEvadeMessage(defender: Character | Enemy): string {
+    return GameManager.getMessage<CombatEvadeMessageText>('COMBAT_EVADE', {
+      defenderName: defender.name,
+    });
+  }
+
+  private getAttackMessage(
+    defender: Character | Enemy,
+    damage: number,
+    isCrit: boolean,
+  ): string {
+    if (isCrit) {
+      return GameManager.getMessage<CombatAttackCritMessageText>(
+        'COMBAT_ATTACK_CRIT',
+        {
+          defenderName: defender.name,
+          dmg: damage,
+          hp: defender.hp,
+        },
+      );
+    }
+
+    return GameManager.getMessage<CombatAttackMessageText>('COMBAT_ATTACK', {
+      defenderName: defender.name,
+      dmg: damage,
+      hp: defender.hp,
     });
   }
 

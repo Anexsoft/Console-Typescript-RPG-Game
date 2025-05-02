@@ -2,8 +2,18 @@ import { Character } from '@game/character';
 
 import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
 
+import { STATS_AVAILABLE_PER_LEVEL } from '@game/engine/constants/character';
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
 import { GameState } from '@game/engine/game.state';
+import {
+  CharacterNewLevelReachedMessageText,
+  CharacterStatusMessageText,
+  CombatEnemyAppearMessageText,
+  CombatWinGoldMessageText,
+  CombatWinMessageText,
+  EnemyStatusMessageText,
+  GameStatsChooseMessage,
+} from '@game/engine/types/texts.types';
 
 import { SceneHandler } from '@game/scenes/scene.interface';
 
@@ -13,11 +23,11 @@ import { CharacterUpgradeHandler } from '@game/character/handlers/character-upgr
 
 import { Enemy } from '@game/npc/enemy';
 import { EnemyType } from '@game/npc/enemy/enemies.enum';
-import { EnemyCreateHandler } from '@game/npc/enemy/handlers/enemy-create.handler';
 import {
-  EnemyFightHandler,
+  CombatHandler,
   FightReport,
-} from '@game/npc/enemy/handlers/enemy-fight.handler';
+} from '@game/npc/enemy/handlers/combat.handler';
+import { EnemyCreateHandler } from '@game/npc/enemy/handlers/enemy-create.handler';
 
 type CombatSceneInput = {
   place: CombatPlace;
@@ -33,7 +43,7 @@ type EnemyStrength = 'weak' | 'strongest';
 
 export class CombatScene implements SceneHandler {
   private readonly enemyCreateHandler = new EnemyCreateHandler();
-  private readonly enemyFightHandler = new EnemyFightHandler();
+  private readonly combatHandler = new CombatHandler();
 
   private readonly characterLevelProgressHandler =
     new CharacterLevelProgressHandler();
@@ -65,13 +75,11 @@ export class CombatScene implements SceneHandler {
   private getMessageForPlace(place: CombatPlace): string {
     switch (place) {
       case CombatPlace.GOBLINGS_FOREST:
-        return 'Llegaste al Bosque de Goblins.';
+        return GameManager.getMessage('FOREST_ENTERING_GOBLINGS');
       case CombatPlace.GOLEM_FOREST:
-        return 'Llegaste al Bosque de Gólems.';
+        return GameManager.getMessage('FOREST_ENTERING_GOLEM');
       case CombatPlace.DRAGON_FOREST:
-        return 'Llegaste al Bosque de Dragones.';
-      default:
-        return 'Llegaste a un lugar desconocido.';
+        return GameManager.getMessage('FOREST_ENTERING_DRAGON');
     }
   }
 
@@ -100,21 +108,23 @@ export class CombatScene implements SceneHandler {
   }
 
   private fight(character: Character, enemy: Enemy): FightReport {
-    return this.enemyFightHandler.handle({ character, enemy });
+    return this.combatHandler.handle({ character, enemy });
   }
 
   private async announceEnemy(enemy: Enemy): Promise<void> {
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message: `⚔️ ¡${enemy.name} salvaje ha aparecido!`,
+      message: GameManager.getMessage<CombatEnemyAppearMessageText>(
+        'COMBAT_ENEMY_APPEAR',
+        { enemyName: enemy.name },
+      ),
     });
 
     await Dialoguer.send({
       who: DialoguerType.ENEMY,
-      message: `Nivel: ${enemy.level}, HP: ${enemy.maxHp}, Daño: ${enemy.dmg}, Evasión: ${enemy.eva}%, Crítico: ${enemy.ctr}%`,
-      options: {
-        nameOverride: enemy.name,
-      },
+      message: GameManager.getMessage<EnemyStatusMessageText>('ENEMY_STATUS', {
+        ...enemy,
+      }),
     });
   }
 
@@ -143,18 +153,31 @@ export class CombatScene implements SceneHandler {
     if (log.winner === 'character') {
       await Dialoguer.send({
         who: DialoguerType.GAME,
-        message: `¡Has ganado el combate y obtuviste ${log.expPointsEarned} puntos de experiencia!`,
+        message: GameManager.getMessage<CombatWinMessageText>('COMBAT_WIN', {
+          expPointsEarned: log.expPointsEarned,
+        }),
+      });
+
+      await Dialoguer.send({
+        who: DialoguerType.GAME,
+        message: GameManager.getMessage<CombatWinGoldMessageText>(
+          'COMBAT_WIN_GOLD',
+          { goldEarned: log.goldEarned },
+        ),
       });
     } else {
       await Dialoguer.send({
         who: DialoguerType.GAME,
-        message: 'Has sido derrotado en combate.',
+        message: GameManager.getMessage('COMBAT_LOSE'),
       });
     }
 
     await Dialoguer.send({
-      who: DialoguerType.PLAYER,
-      message: `Estado actual - HP: ${character.hp}, MP: ${character.mp}, EXP: ${character.exp}, Nivel: ${character.level}`,
+      who: DialoguerType.GAME,
+      message: GameManager.getMessage<CharacterStatusMessageText>(
+        'CHARACTER_STATUS',
+        { ...character },
+      ),
     });
   }
 
@@ -171,7 +194,10 @@ export class CombatScene implements SceneHandler {
     if (newLevelReached) {
       await Dialoguer.send({
         who: DialoguerType.GAME,
-        message: `🎉 ¡Has alcanzado el nivel ${newLevel}!`,
+        message: GameManager.getMessage<CharacterNewLevelReachedMessageText>(
+          'CHARACTER_NEW_LEVEL_REACHED',
+          { newLevel },
+        ),
       });
 
       await this.improvePlayerAttributes(character);
@@ -182,19 +208,20 @@ export class CombatScene implements SceneHandler {
 
   private async improvePlayerAttributes(character: Character): Promise<void> {
     const statChoices = [
-      { name: 'STR (Fuerza)', value: 'str' },
-      { name: 'VIT (Vitalidad)', value: 'vit' },
-      { name: 'INT (Inteligencia)', value: 'int' },
-      { name: 'DEX (Destreza)', value: 'dex' },
-      { name: 'LUK (Suerte)', value: 'luk' },
+      { name: 'STR', value: 'str' },
+      { name: 'VIT', value: 'vit' },
+      { name: 'INT', value: 'int' },
+      { name: 'DEX', value: 'dex' },
+      { name: 'LUK', value: 'luk' },
     ];
 
-    const availablePoints = 20;
-
-    for (let i = 0; i < availablePoints; i++) {
+    for (let i = 0; i < STATS_AVAILABLE_PER_LEVEL; i++) {
       const stat = await Dialoguer.send<'str' | 'vit' | 'int' | 'dex' | 'luk'>({
         who: DialoguerType.PLAYER,
-        message: `Elige un atributo para mejorar (${i + 1}/${availablePoints}):`,
+        message: GameManager.getMessage<GameStatsChooseMessage>(
+          'GAME_STATS_CHOOSE',
+          { index: i + 1, availableStats: STATS_AVAILABLE_PER_LEVEL },
+        ),
         options: {
           type: 'list',
           choices: statChoices,

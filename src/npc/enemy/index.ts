@@ -1,5 +1,6 @@
 export type EnemyReward = {
   exp: number;
+  gold: number;
 };
 
 export class Enemy {
@@ -24,6 +25,9 @@ export class Enemy {
   /** Experience points granted when defeated */
   expGiven: number;
 
+  /** Gold granted when defeated */
+  goldGiven: number;
+
   /** Enemy's level */
   level: number;
 
@@ -35,6 +39,7 @@ export class Enemy {
       eva: number;
       ctr: number;
       expGiven: number;
+      goldGiven: number;
       level: number;
     },
   ) {
@@ -45,6 +50,7 @@ export class Enemy {
     this.eva = options.eva;
     this.ctr = options.ctr;
     this.expGiven = options.expGiven;
+    this.goldGiven = options.goldGiven;
     this.level = options.level;
   }
 
@@ -60,6 +66,6 @@ export class Enemy {
 
   /** Returns the reward after defeat (for now: only experience) */
   getReward(): EnemyReward {
-    return { exp: this.expGiven };
+    return { exp: this.expGiven, gold: this.goldGiven };
   }
 }
