@@ -1,3 +1,5 @@
+import { Handler } from '@game/common/interfaces/handler.interfacer';
+
 import {
   BASE_DMG,
   BASE_HP,
@@ -9,13 +11,9 @@ import {
   MP_PER_INT,
 } from '@game/engine/constants/character';
 
-import { CharacterHandler } from './character.interfaces';
-
 import { Character } from '..';
 
-export class CharacterUpgradeHandler
-  implements CharacterHandler<Character, void>
-{
+export class CharacterUpgradeHandler implements Handler<Character, void> {
   handle(character: Character): void {
     character.maxHp = Math.round(
       BASE_HP + character.level * character.vit * HP_PER_VIT,
@@ -24,16 +22,10 @@ export class CharacterUpgradeHandler
       BASE_MP + character.level * character.int * MP_PER_INT,
     );
 
-    character.eva = parseFloat(
-      (character.level * character.dex * EVA_PER_DEX).toFixed(4),
-    );
-
-    character.ctr = parseFloat(
-      (character.level * character.luk * CTR_PER_LUK).toFixed(4),
-    );
-
-    character.dmg = parseFloat(
-      (BASE_DMG + character.level * character.str * DMG_PER_STR).toFixed(4),
+    character.eva = Math.round(character.level * character.dex * EVA_PER_DEX);
+    character.ctr = Math.round(character.level * character.luk * CTR_PER_LUK);
+    character.dmg = Math.round(
+      BASE_DMG + character.level * character.str * DMG_PER_STR,
     );
 
     character.hp = Math.round(character.maxHp);

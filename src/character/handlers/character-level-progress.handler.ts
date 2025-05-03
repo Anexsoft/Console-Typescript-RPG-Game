@@ -1,12 +1,13 @@
-import { CHARACTER_LEVEL } from '@game/engine/constants/character';
+import { Handler } from '@game/common/interfaces/handler.interfacer';
 
-import { CharacterHandler } from './character.interfaces';
+import { CHARACTER_LEVEL } from '@game/engine/constants/character';
 
 import { Character } from '..';
 
-type Response = {
+type CharacterLevelProgressHandlerResponse = {
   newLevelReached: boolean;
   newLevel?: number;
+  levelsGained?: number;
 };
 
 type CharacterLevelProgressInput = {
@@ -15,31 +16,38 @@ type CharacterLevelProgressInput = {
 };
 
 export class CharacterLevelProgressHandler
-  implements CharacterHandler<CharacterLevelProgressInput, Response>
+  implements
+    Handler<CharacterLevelProgressInput, CharacterLevelProgressHandlerResponse>
 {
-  handle({ character, newExpPoints }: CharacterLevelProgressInput): Response {
-    character.exp += newExpPoints;
-
+  handle({
+    character,
+    newExpPoints,
+  }: CharacterLevelProgressInput): CharacterLevelProgressHandlerResponse {
     const maxLevel = Math.max(...Object.keys(CHARACTER_LEVEL).map(Number));
 
-    if (character.level >= maxLevel) {
-      character.level = maxLevel;
-      character.exp = Math.min(character.exp, CHARACTER_LEVEL[maxLevel][1]);
-      return { newLevelReached: false };
+    character.exp += newExpPoints;
+
+    let newLevel = character.level;
+
+    for (let level = maxLevel; level >= 1; level--) {
+      const [min, max] = CHARACTER_LEVEL[level];
+      if (character.exp >= min && character.exp <= max) {
+        newLevel = level;
+        break;
+      }
     }
 
-    const [, upperLimit] = CHARACTER_LEVEL[character.level];
+    const levelsGained = newLevel - character.level;
+    const newLevelReached = levelsGained > 0;
 
-    if (character.exp > upperLimit) {
-      character.level++;
-      return {
-        newLevelReached: true,
-        newLevel: character.level,
-      };
+    if (newLevelReached) {
+      character.level = newLevel;
     }
 
     return {
-      newLevelReached: false,
+      newLevelReached,
+      newLevel: newLevelReached ? newLevel : undefined,
+      levelsGained: newLevelReached ? levelsGained : undefined,
     };
   }
 }

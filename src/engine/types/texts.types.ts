@@ -1,3 +1,5 @@
+import { EnemyLocation } from '@game/npc/enemy/collection/enemy-location.collection';
+
 import { GAME_TEXTS } from '../constants/texts';
 
 /* GAME */
@@ -40,6 +42,8 @@ export type CharacterStatusMessageText = {
   level: number;
   hp: number;
   mp: number;
+  eva: number;
+  ctr: number;
   exp: number;
 };
 
@@ -63,6 +67,11 @@ export type MainCharacterCreationMessageText = {
 
 export type MainCharacterWelcomeBackMessageText = {
   characterName: string;
+};
+
+/* FIGHT */
+export type CombatEnteringMessageText = {
+  locationName: EnemyLocation;
 };
 
 export type GAME_TEXTS_TYPES = keyof typeof GAME_TEXTS;

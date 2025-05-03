@@ -1,6 +1,7 @@
 import { Character } from '@game/character';
 
 import { DialoguerType } from '@game/common/dialoguer';
+import { Handler } from '@game/common/interfaces/handler.interfacer';
 
 import { GameManager } from '@game/engine/game.manager';
 import {
@@ -10,7 +11,6 @@ import {
 } from '@game/engine/types/texts.types';
 
 import { Enemy } from '@game/npc/enemy';
-import { EnemyHandler } from '@game/npc/enemy/handlers/enemy.interfaces';
 
 export type FightReport = {
   winner: 'character' | 'enemy';
@@ -22,29 +22,37 @@ export type FightReport = {
 type FightReportLog = {
   who: DialoguerType;
   message: string;
+  enemyName?: string;
 };
 
-type CombatHandlerInput = {
+type CharacterFightHandlerInput = {
   character: Character;
-  enemy: Enemy;
+  enemies: Enemy[];
 };
 
 type Owner = 'enemy' | 'character';
 
-export class CombatHandler
-  implements EnemyHandler<CombatHandlerInput, FightReport>
+export class CharacterFightHandler
+  implements Handler<CharacterFightHandlerInput, FightReport>
 {
-  handle({ character, enemy }: CombatHandlerInput): FightReport {
+  handle({ character, enemies }: CharacterFightHandlerInput): FightReport {
     const logs: FightReportLog[] = [];
+    const aliveEnemies = [...enemies];
 
-    while (character.hp > 0 && enemy.isAlive()) {
-      this.executeTurn(character, enemy, logs, 'character');
+    while (character.hp > 0 && aliveEnemies.length > 0) {
+      const targetEnemy = aliveEnemies[0];
 
-      if (!enemy.isAlive()) {
-        break;
+      this.executeTurn(character, targetEnemy, logs, 'character', targetEnemy);
+
+      if (!targetEnemy.isAlive()) {
+        aliveEnemies.shift();
       }
 
-      this.executeTurn(enemy, character, logs, 'enemy');
+      for (const enemy of aliveEnemies) {
+        if (enemy.isAlive() && character.hp > 0) {
+          this.executeTurn(enemy, character, logs, 'enemy', enemy);
+        }
+      }
     }
 
     const winner = character.hp > 0 ? 'character' : 'enemy';
@@ -53,8 +61,8 @@ export class CombatHandler
     let goldEarned = 0;
 
     if (winner === 'character') {
-      expPointsEarned = enemy.expGiven;
-      goldEarned = enemy.goldGiven;
+      expPointsEarned = enemies.reduce((acc, e) => acc + e.expGiven, 0);
+      goldEarned = enemies.reduce((acc, e) => acc + e.goldGiven, 0);
     }
 
     return { winner, expPointsEarned, goldEarned, logs };
@@ -65,6 +73,7 @@ export class CombatHandler
     defender: Character | Enemy,
     logs: FightReportLog[],
     type: Owner,
+    enemy?: Enemy,
   ): void {
     const dialoguerType =
       type === 'character' ? DialoguerType.PLAYER : DialoguerType.ENEMY;
@@ -73,16 +82,14 @@ export class CombatHandler
       logs.push({
         who: dialoguerType,
         message: this.getEvadeMessage(defender),
+        enemyName: enemy?.name,
       });
-
       return;
     }
 
     const isCrit = this.didCrit(attacker, type);
     let damage = attacker.dmg;
-    if (isCrit) {
-      damage *= 2;
-    }
+    if (isCrit) damage *= 2;
 
     if (defender instanceof Enemy) {
       defender.takeDamage(damage);
@@ -93,6 +100,7 @@ export class CombatHandler
     logs.push({
       who: dialoguerType,
       message: this.getAttackMessage(defender, damage, isCrit),
+      enemyName: enemy?.name,
     });
   }
 
@@ -126,7 +134,7 @@ export class CombatHandler
   }
 
   private didEvade(target: Character | Enemy): boolean {
-    const eva = target instanceof Enemy ? target.eva / 100 : target.eva;
+    const eva = target.eva / 100;
     return Math.random() < eva;
   }
 
@@ -134,7 +142,7 @@ export class CombatHandler
     const ctr =
       type === 'enemy'
         ? (attacker as Enemy).ctr / 100
-        : (attacker as Character).ctr;
+        : (attacker as Character).ctr / 100;
 
     return Math.random() < ctr;
   }

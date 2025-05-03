@@ -1,5 +1,5 @@
 export { MainScene } from '@game/scenes/main';
-export { SceneHandler } from '@game/scenes/scene.interface';
+export { SceneHandler } from '@game/common/interfaces/scene.interface';
 
 export { CombatScene } from '@game/scenes/combat';
 
