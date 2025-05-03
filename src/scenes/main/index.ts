@@ -2,6 +2,7 @@ import { Character } from '@game/character';
 
 import { DEFAULT_CHARACTER_NAME } from '@game/common/config';
 import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
+import { SceneHandler } from '@game/common/interfaces/scene.interface';
 
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
 import { GameState } from '@game/engine/game.state';
@@ -9,8 +10,6 @@ import {
   MainCharacterCreationMessageText,
   MainCharacterWelcomeBackMessageText,
 } from '@game/engine/types/texts.types';
-
-import { SceneHandler } from '@game/scenes/scene.interface';
 
 import { CharacterCreateHandler } from '@game/character/handlers/character-create.handler';
 import { CharacterGetHandler } from '@game/character/handlers/character-get.handler';

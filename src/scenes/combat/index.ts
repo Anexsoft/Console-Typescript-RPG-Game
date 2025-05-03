@@ -1,6 +1,7 @@
 import { Character } from '@game/character';
 
 import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
+import { SceneHandler } from '@game/common/interfaces/scene.interface';
 
 import { STATS_AVAILABLE_PER_LEVEL } from '@game/engine/constants/character';
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
@@ -9,157 +10,120 @@ import {
   CharacterNewLevelReachedMessageText,
   CharacterStatusMessageText,
   CombatEnemyAppearMessageText,
+  CombatEnteringMessageText,
   CombatWinGoldMessageText,
   CombatWinMessageText,
   EnemyStatusMessageText,
   GameStatsChooseMessage,
 } from '@game/engine/types/texts.types';
 
-import { SceneHandler } from '@game/scenes/scene.interface';
-
+import {
+  CharacterFightHandler,
+  FightReport,
+} from '@game/character/handlers/character-fight.handler';
 import { CharacterLevelProgressHandler } from '@game/character/handlers/character-level-progress.handler';
 import { CharacterUpdateHandler } from '@game/character/handlers/character-update.handler';
 import { CharacterUpgradeHandler } from '@game/character/handlers/character-upgrade.handler';
 
 import { Enemy } from '@game/npc/enemy';
-import { EnemyType } from '@game/npc/enemy/enemies.enum';
-import {
-  CombatHandler,
-  FightReport,
-} from '@game/npc/enemy/handlers/combat.handler';
+import { EnemyLocation } from '@game/npc/enemy/collection/enemy-location.collection';
 import { EnemyCreateHandler } from '@game/npc/enemy/handlers/enemy-create.handler';
+import { EnmyGetCollectionHandler } from '@game/npc/enemy/handlers/enemy-get-collection.handler';
 
 type CombatSceneInput = {
-  place: CombatPlace;
+  location: EnemyLocation;
 };
-
-export enum CombatPlace {
-  GOBLINGS_FOREST,
-  GOLEM_FOREST,
-  DRAGON_FOREST,
-}
-
-type EnemyStrength = 'weak' | 'strongest';
 
 export class CombatScene implements SceneHandler {
   private readonly enemyCreateHandler = new EnemyCreateHandler();
-  private readonly combatHandler = new CombatHandler();
+  private readonly enemyGetCollectionHandler = new EnmyGetCollectionHandler();
 
+  private readonly CharacterFightHandler = new CharacterFightHandler();
   private readonly characterLevelProgressHandler =
     new CharacterLevelProgressHandler();
   private readonly characterUpgradeHandler = new CharacterUpgradeHandler();
   private readonly characterUpdateHandler = new CharacterUpdateHandler();
 
-  async handle({ place }: CombatSceneInput): Promise<void> {
+  async handle({ location }: CombatSceneInput): Promise<void> {
     const character = GameState.character;
-    const message = this.getMessageForPlace(place);
 
     await Dialoguer.send({
       who: DialoguerType.GAME,
-      message,
-    });
-
-    const enemy = this.createEnemyFromPlace(place);
-
-    await this.announceEnemy(enemy);
-
-    const report = this.fight(character, enemy);
-
-    await this.printLogs(report, character, enemy);
-
-    await this.updatePlayerProgress(character, report.expPointsEarned);
-
-    GameManager.changeScene(GameManagerSceneName.TownScene);
-  }
-
-  private getMessageForPlace(place: CombatPlace): string {
-    switch (place) {
-      case CombatPlace.GOBLINGS_FOREST:
-        return GameManager.getMessage('FOREST_ENTERING_GOBLINGS');
-      case CombatPlace.GOLEM_FOREST:
-        return GameManager.getMessage('FOREST_ENTERING_GOLEM');
-      case CombatPlace.DRAGON_FOREST:
-        return GameManager.getMessage('FOREST_ENTERING_DRAGON');
-    }
-  }
-
-  private createEnemyFromPlace(place: CombatPlace): Enemy {
-    let type: EnemyType;
-    let power: EnemyStrength;
-
-    switch (place) {
-      case CombatPlace.GOBLINGS_FOREST:
-        type = EnemyType.GOBLIN;
-        power = 'weak';
-        break;
-      case CombatPlace.GOLEM_FOREST:
-        type = EnemyType.GOLEM;
-        power = 'weak';
-        break;
-      case CombatPlace.DRAGON_FOREST:
-        type = EnemyType.DRAGON;
-        power = 'strongest';
-        break;
-      default:
-        throw new Error('Unknown combat place');
-    }
-
-    return this.enemyCreateHandler.handle({ type, power });
-  }
-
-  private fight(character: Character, enemy: Enemy): FightReport {
-    return this.combatHandler.handle({ character, enemy });
-  }
-
-  private async announceEnemy(enemy: Enemy): Promise<void> {
-    await Dialoguer.send({
-      who: DialoguerType.GAME,
-      message: GameManager.getMessage<CombatEnemyAppearMessageText>(
-        'COMBAT_ENEMY_APPEAR',
-        { enemyName: enemy.name },
+      message: GameManager.getMessage<CombatEnteringMessageText>(
+        'COMBAT_ENTERING_MESSAGE',
+        { locationName: location },
       ),
     });
 
-    await Dialoguer.send({
-      who: DialoguerType.ENEMY,
-      message: GameManager.getMessage<EnemyStatusMessageText>('ENEMY_STATUS', {
-        ...enemy,
-      }),
-    });
+    const enemies = this.getEnemiesFromLocation(location);
+
+    await this.announceEnemies(enemies);
+
+    const report = this.CharacterFightHandler.handle({ character, enemies });
+
+    await this.printLogs(report);
+
+    await this.updatePlayerProgress(character, report.expPointsEarned);
+
+    if (report.winner === 'character') {
+      GameManager.changeScene(GameManagerSceneName.TownScene);
+    } else {
+      GameManager.changeScene(GameManagerSceneName.InnScene);
+    }
   }
 
-  private async printLogs(
-    log: FightReport,
-    character: Character,
-    enemy: Enemy,
-  ): Promise<void> {
+  private getEnemiesFromLocation(location: EnemyLocation): Enemy[] {
+    const enemyCollection = this.enemyGetCollectionHandler.handle(location);
+
+    return enemyCollection.map((type) => this.enemyCreateHandler.handle(type));
+  }
+
+  private async announceEnemies(enemies: Enemy[]): Promise<void> {
+    for (const enemy of enemies) {
+      await Dialoguer.send({
+        who: DialoguerType.GAME,
+        message: GameManager.getMessage<CombatEnemyAppearMessageText>(
+          'COMBAT_ENEMY_APPEAR',
+          { enemyName: enemy.name },
+        ),
+      });
+
+      await Dialoguer.send({
+        who: DialoguerType.ENEMY,
+        message: GameManager.getMessage<EnemyStatusMessageText>(
+          'ENEMY_STATUS',
+          enemy,
+        ),
+        options: {
+          nameOverride: enemy.name,
+        },
+      });
+    }
+  }
+
+  private async printLogs(log: FightReport): Promise<void> {
     for (const entry of log.logs) {
       if (entry.who === DialoguerType.ENEMY) {
         await Dialoguer.send({
           who: entry.who,
           message: entry.message,
           options: {
-            nameOverride: enemy.name,
+            nameOverride: entry.enemyName,
           },
-        });
-      } else {
-        await Dialoguer.send({
-          who: entry.who,
-          message: entry.message,
         });
       }
     }
 
     if (log.winner === 'character') {
       await Dialoguer.send({
-        who: DialoguerType.GAME,
+        who: DialoguerType.PLAYER,
         message: GameManager.getMessage<CombatWinMessageText>('COMBAT_WIN', {
           expPointsEarned: log.expPointsEarned,
         }),
       });
 
       await Dialoguer.send({
-        who: DialoguerType.GAME,
+        who: DialoguerType.PLAYER,
         message: GameManager.getMessage<CombatWinGoldMessageText>(
           'COMBAT_WIN_GOLD',
           { goldEarned: log.goldEarned },
@@ -171,21 +135,13 @@ export class CombatScene implements SceneHandler {
         message: GameManager.getMessage('COMBAT_LOSE'),
       });
     }
-
-    await Dialoguer.send({
-      who: DialoguerType.GAME,
-      message: GameManager.getMessage<CharacterStatusMessageText>(
-        'CHARACTER_STATUS',
-        { ...character },
-      ),
-    });
   }
 
   private async updatePlayerProgress(
     character: Character,
     newExpPoints: number,
   ): Promise<void> {
-    const { newLevelReached, newLevel } =
+    const { newLevelReached, newLevel, levelsGained } =
       this.characterLevelProgressHandler.handle({
         character,
         newExpPoints,
@@ -200,13 +156,26 @@ export class CombatScene implements SceneHandler {
         ),
       });
 
-      await this.improvePlayerAttributes(character);
+      await this.improvePlayerAttributes(character, levelsGained);
     }
 
     await this.characterUpdateHandler.handle(character);
+
+    await Dialoguer.send({
+      who: DialoguerType.PLAYER,
+      message: GameManager.getMessage<CharacterStatusMessageText>(
+        'CHARACTER_STATUS',
+        { ...character },
+      ),
+    });
   }
 
-  private async improvePlayerAttributes(character: Character): Promise<void> {
+  private async improvePlayerAttributes(
+    character: Character,
+    levelsGained: number,
+  ): Promise<void> {
+    const availableStats = levelsGained * STATS_AVAILABLE_PER_LEVEL;
+
     const statChoices = [
       { name: 'STR', value: 'str' },
       { name: 'VIT', value: 'vit' },
@@ -215,12 +184,12 @@ export class CombatScene implements SceneHandler {
       { name: 'LUK', value: 'luk' },
     ];
 
-    for (let i = 0; i < STATS_AVAILABLE_PER_LEVEL; i++) {
+    for (let i = 0; i < availableStats; i++) {
       const stat = await Dialoguer.send<'str' | 'vit' | 'int' | 'dex' | 'luk'>({
         who: DialoguerType.PLAYER,
         message: GameManager.getMessage<GameStatsChooseMessage>(
           'GAME_STATS_CHOOSE',
-          { index: i + 1, availableStats: STATS_AVAILABLE_PER_LEVEL },
+          { index: i + 1, availableStats },
         ),
         options: {
           type: 'list',

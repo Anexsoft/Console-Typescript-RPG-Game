@@ -1,10 +1,9 @@
 import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
+import { SceneHandler } from '@game/common/interfaces/scene.interface';
 
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
 
-import { SceneHandler } from '@game/scenes/scene.interface';
-
-import { CombatPlace } from '../combat';
+import { EnemyLocation } from '@game/npc/enemy/collection/enemy-location.collection';
 
 enum TownSceneAction {
   INN,
@@ -21,10 +20,10 @@ export class TownScene implements SceneHandler {
       options: {
         type: 'select',
         choices: [
-          { name: 'Ir a descansar', value: TownSceneAction.INN },
-          { name: 'Ir a la tienda', value: TownSceneAction.STORE },
-          { name: 'Ir a la taberna', value: TownSceneAction.TAVERN },
-          { name: 'Ir a cazar', value: TownSceneAction.HUNT },
+          { name: 'Rest at the inn', value: TownSceneAction.INN },
+          { name: 'Visit the store', value: TownSceneAction.STORE },
+          { name: 'Enter the tavern', value: TownSceneAction.TAVERN },
+          { name: 'Go hunting', value: TownSceneAction.HUNT },
         ],
       },
     });
@@ -48,29 +47,57 @@ export class TownScene implements SceneHandler {
   }
 
   async changeToCombatSceneOnSelectedPlace(): Promise<void> {
-    const place = await Dialoguer.send<TownSceneAction>({
+    const location = await Dialoguer.send<TownSceneAction>({
       who: DialoguerType.GAME,
       message: GameManager.getMessage('TOWN_GO_TO_HUNT'),
       options: {
         type: 'select',
         choices: [
           {
-            name: 'Bosque de Goblins (lvl >1)',
-            value: CombatPlace.GOBLINGS_FOREST,
+            name: 'Slime Fields (lvl 1-5)',
+            value: EnemyLocation.SLIME_FIELDS,
           },
           {
-            name: 'Bosque de Golems (lvl >30)',
-            value: CombatPlace.GOLEM_FOREST,
+            name: 'Abandoned Farm (lvl 6-10)',
+            value: EnemyLocation.ABANDONED_FARM,
           },
           {
-            name: 'Bosque de Dragones (lvl >50)',
-            value: CombatPlace.DRAGON_FOREST,
+            name: 'Rat Caves (lvl 11-15)',
+            value: EnemyLocation.RAT_CAVES,
+          },
+          {
+            name: 'Spider Nest (lvl 16-22)',
+            value: EnemyLocation.SPIDER_NEST,
+          },
+          {
+            name: 'Goblin Camp (lvl 23-25)',
+            value: EnemyLocation.GOBLIN_CAMP,
+          },
+          {
+            name: 'Cursed Graveyard (lvl 26-30)',
+            value: EnemyLocation.CURSED_GRAVEYARD,
+          },
+          {
+            name: 'Bandit Hills (lvl 31-35)',
+            value: EnemyLocation.BANDIT_HILLS,
+          },
+          {
+            name: 'Troll Bridge (lvl 36-40)',
+            value: EnemyLocation.TROLL_BRIDGE,
+          },
+          {
+            name: 'Demonic Altar (lvl 41-45)',
+            value: EnemyLocation.DEMONIC_ALTAR,
+          },
+          {
+            name: 'Dragon Peak (lvl 46-50)',
+            value: EnemyLocation.DRAGON_PEAK,
           },
         ],
       },
     });
 
-    GameManager.changeScene(GameManagerSceneName.CombatScene, { place });
+    GameManager.changeScene(GameManagerSceneName.CombatScene, { location });
   }
 
   async changeSceneOnSelectedAction(action: TownSceneAction): Promise<void> {

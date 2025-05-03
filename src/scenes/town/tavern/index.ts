@@ -1,8 +1,7 @@
 import { Dialoguer, DialoguerType } from '@game/common/dialoguer';
+import { SceneHandler } from '@game/common/interfaces/scene.interface';
 
 import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
-
-import { SceneHandler } from '@game/scenes/scene.interface';
 
 import messages from './messages.json';
 

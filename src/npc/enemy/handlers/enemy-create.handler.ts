@@ -1,79 +1,44 @@
-import { ENEMY_STAT_FACTOR_PER_LEVEL } from '@game/engine/constants/enemy';
+import { Handler } from '@game/common/interfaces/handler.interfacer';
+
+import {
+  ENEMY_MAX_CTR,
+  ENEMY_MAX_EVA,
+  ENEMY_STAT_FACTOR_PER_LEVEL,
+} from '@game/engine/constants/enemy';
 
 import { Enemy } from '@game/npc/enemy';
-import { EnemyType } from '@game/npc/enemy/enemies.enum';
-import enemyTypes from '@game/npc/enemy/enemies.json';
-import { EnemyHandler } from '@game/npc/enemy/handlers/enemy.interfaces';
-import { EnemyTypesConfig } from '@game/npc/enemy/index.types';
 
-type EnemyStrength = 'weak' | 'strongest';
+import { ENEMIES_COLLECTION } from '../collection/enemy-stats.collection';
+import { EnemyType } from '../collection/enemy-type.collection';
 
-interface EnemyCreateHandlerInput {
-  type: EnemyType;
-  power: EnemyStrength;
-}
-
-export class EnemyCreateHandler
-  implements EnemyHandler<EnemyCreateHandlerInput, Enemy>
-{
-  private readonly enemyTypes: EnemyTypesConfig = enemyTypes;
-
-  handle({ type, power }: EnemyCreateHandlerInput): Enemy {
-    const enemyBase = this.enemyTypes[type];
+export class EnemyCreateHandler implements Handler<EnemyType, Enemy> {
+  handle(type: EnemyType): Enemy {
+    const enemyBase = ENEMIES_COLLECTION[type];
 
     if (!enemyBase) {
       throw new Error(`Enemy type "${type}" not found`);
     }
 
-    const level = this.pickValue(enemyBase.level, power);
-
-    const maxHp = this.scaleValue(
-      this.pickValue(enemyBase.maxHp, power),
-      level,
-    );
-
-    const dmg = this.scaleValue(this.pickValue(enemyBase.dmg, power), level);
-
-    const eva = Math.min(
-      this.scaleValue(this.pickValue(enemyBase.eva, power), level),
-      25,
-    );
-
-    const ctr = Math.min(
-      this.scaleValue(this.pickValue(enemyBase.ctr, power), level),
-      50,
-    );
-
-    const expGiven = this.scaleValue(
-      this.pickValue(enemyBase.expGiven, power),
-      level,
-    );
-
-    const goldGiven = this.scaleValue(
-      this.pickValue(enemyBase.goldGiven, power),
-      level,
-    );
+    const level = this.pickValue(enemyBase.level);
 
     return new Enemy(enemyBase.name, {
       level,
-      maxHp,
-      dmg,
-      eva,
-      ctr,
-      expGiven,
-      goldGiven,
+      maxHp: this.scaleValue(this.pickValue(enemyBase.maxHp), level),
+      dmg: this.scaleValue(this.pickValue(enemyBase.dmg), level),
+      eva: Math.min(
+        this.scaleValue(this.pickValue(enemyBase.eva), level),
+        ENEMY_MAX_EVA,
+      ),
+      ctr: Math.min(
+        this.scaleValue(this.pickValue(enemyBase.ctr), level),
+        ENEMY_MAX_CTR,
+      ),
+      expGiven: this.scaleValue(this.pickValue(enemyBase.expGiven), level),
+      goldGiven: this.scaleValue(this.pickValue(enemyBase.goldGiven), level),
     });
   }
 
-  private pickValue(range: number[], power: EnemyStrength): number {
-    if (power === 'weak') {
-      return range[0];
-    }
-
-    if (power === 'strongest') {
-      return range[range.length - 1];
-    }
-
+  private pickValue(range: number[]): number {
     const index = Math.floor(Math.random() * range.length);
     return range[index];
   }

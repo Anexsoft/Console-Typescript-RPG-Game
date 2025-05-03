@@ -1,11 +1,11 @@
-import { CharacterRepository } from '@game/character/repositories/character.repository';
+import { Handler } from '@game/common/interfaces/handler.interfacer';
 
-import { CharacterHandler } from './character.interfaces';
+import { CharacterRepository } from '@game/character/repositories/character.repository';
 
 import { Character } from '../';
 
 export class CharacterCreateHandler
-  implements CharacterHandler<Character, Promise<void>>
+  implements Handler<Character, Promise<void>>
 {
   private readonly characterRepository = new CharacterRepository();
 
