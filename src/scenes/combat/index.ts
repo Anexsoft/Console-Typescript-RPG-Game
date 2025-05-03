@@ -103,15 +103,13 @@ export class CombatScene implements SceneHandler {
 
   private async printLogs(log: FightReport): Promise<void> {
     for (const entry of log.logs) {
-      if (entry.who === DialoguerType.ENEMY) {
-        await Dialoguer.send({
-          who: entry.who,
-          message: entry.message,
-          options: {
-            nameOverride: entry.enemyName,
-          },
-        });
-      }
+      await Dialoguer.send({
+        who: entry.who,
+        message: entry.message,
+        options: {
+          nameOverride: entry.enemyName,
+        },
+      });
     }
 
     if (log.winner === 'character') {

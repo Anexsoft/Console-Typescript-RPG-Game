@@ -15,19 +15,22 @@ export const GAME_TEXTS = {
   COMBAT_WIN_GOLD:
     'you also found [c:yellow]{{goldEarned}} gold coins[/] on the battlefield.',
   COMBAT_LOSE: 'you were defeated in battle. Train harder and try again!',
-
   COMBAT_ENEMY_APPEAR: 'a wild {{enemyName}} appears, ready to fight!',
+  COMBAT_TURN: 'current turn is {{turn}}',
+
+  /* SPECIAL POWERS */
+  SPECIAL_POWER_SLASH_ATTACK:
+    'unleashes a devastating [c:yellow]SLASH ATTACK[/] to all enemies in place!',
 
   /* CHARACTER */
   CHARACTER_STATUS:
-    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, evasion: {{eva}}%, crit chance: {{ctr}}%, EXP: {{exp}}',
-
+    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',
   CHARACTER_NEW_LEVEL_REACHED:
     '🎉 you leveled up! You are now level {{newLevel}}.',
 
   /* ENEMY */
   ENEMY_STATUS:
-    'level: {{level}}, HP: {{hp}}, DMG: {{dmg}}, evasion: {{eva}}%, crit chance: {{ctr}}%',
+    'level: {{level}}, HP: {{hp}}, DMG: {{dmg}}, EVA: {{eva}}%, CTR: {{ctr}}%',
 
   /* SCENE > MAIN */
   MAIN_WELCOME: '🌟 welcome to your console RPG adventure 🌟',

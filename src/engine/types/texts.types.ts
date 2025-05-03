@@ -37,6 +37,10 @@ export type CombatEnemyAppearMessageText = {
   enemyName: string;
 };
 
+export type CombatTurnMessageText = {
+  turn: number;
+};
+
 /* CHARACTER */
 export type CharacterStatusMessageText = {
   level: number;

@@ -42,7 +42,7 @@ export class CharacterFightHandler
     while (character.hp > 0 && aliveEnemies.length > 0) {
       const targetEnemy = aliveEnemies[0];
 
-      this.executeTurn(character, targetEnemy, logs, 'character', targetEnemy);
+      this.executeCharacterAttackTurn(character, targetEnemy, logs);
 
       if (!targetEnemy.isAlive()) {
         aliveEnemies.shift();
@@ -50,57 +50,63 @@ export class CharacterFightHandler
 
       for (const enemy of aliveEnemies) {
         if (enemy.isAlive() && character.hp > 0) {
-          this.executeTurn(enemy, character, logs, 'enemy', enemy);
+          this.executeEnemyAttackTurn(enemy, character, logs);
         }
       }
     }
 
-    const winner = character.hp > 0 ? 'character' : 'enemy';
-
-    let expPointsEarned = 0;
-    let goldEarned = 0;
-
-    if (winner === 'character') {
-      expPointsEarned = enemies.reduce((acc, e) => acc + e.expGiven, 0);
-      goldEarned = enemies.reduce((acc, e) => acc + e.goldGiven, 0);
-    }
-
-    return { winner, expPointsEarned, goldEarned, logs };
+    return this.buildFightReport(character, enemies, logs);
   }
 
-  private executeTurn(
-    attacker: Character | Enemy,
-    defender: Character | Enemy,
+  private executeCharacterAttackTurn(
+    attacker: Character,
+    defender: Enemy,
     logs: FightReportLog[],
-    type: Owner,
-    enemy?: Enemy,
   ): void {
-    const dialoguerType =
-      type === 'character' ? DialoguerType.PLAYER : DialoguerType.ENEMY;
-
     if (this.didEvade(defender)) {
       logs.push({
-        who: dialoguerType,
+        who: DialoguerType.PLAYER,
         message: this.getEvadeMessage(defender),
-        enemyName: enemy?.name,
       });
       return;
     }
 
-    const isCrit = this.didCrit(attacker, type);
+    const isCrit = this.didCrit(attacker, 'character');
     let damage = attacker.dmg;
     if (isCrit) damage *= 2;
 
-    if (defender instanceof Enemy) {
-      defender.takeDamage(damage);
-    } else {
-      defender.hp = Math.max(0, defender.hp - damage);
-    }
+    defender.takeDamage(damage);
 
     logs.push({
-      who: dialoguerType,
+      who: DialoguerType.PLAYER,
       message: this.getAttackMessage(defender, damage, isCrit),
-      enemyName: enemy?.name,
+    });
+  }
+
+  private executeEnemyAttackTurn(
+    attacker: Enemy,
+    defender: Character,
+    logs: FightReportLog[],
+  ): void {
+    if (this.didEvade(defender)) {
+      logs.push({
+        who: DialoguerType.ENEMY,
+        message: this.getEvadeMessage(defender),
+        enemyName: attacker.name,
+      });
+      return;
+    }
+
+    const isCrit = this.didCrit(attacker, 'enemy');
+    let damage = attacker.dmg;
+    if (isCrit) damage *= 2;
+
+    defender.hp = Math.max(0, defender.hp - damage);
+
+    logs.push({
+      who: DialoguerType.ENEMY,
+      message: this.getAttackMessage(defender, damage, isCrit),
+      enemyName: attacker.name,
     });
   }
 
@@ -145,5 +151,23 @@ export class CharacterFightHandler
         : (attacker as Character).ctr / 100;
 
     return Math.random() < ctr;
+  }
+
+  private buildFightReport(
+    character: Character,
+    enemies: Enemy[],
+    logs: FightReportLog[],
+  ): FightReport {
+    const winner = character.hp > 0 ? 'character' : 'enemy';
+
+    let expPointsEarned = 0;
+    let goldEarned = 0;
+
+    if (winner === 'character') {
+      expPointsEarned = enemies.reduce((acc, e) => acc + e.expGiven, 0);
+      goldEarned = enemies.reduce((acc, e) => acc + e.goldGiven, 0);
+    }
+
+    return { winner, expPointsEarned, goldEarned, logs };
   }
 }

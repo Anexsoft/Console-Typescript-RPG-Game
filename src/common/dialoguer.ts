@@ -62,6 +62,10 @@ export class Dialoguer {
     return action as R;
   }
 
+  static clear(): void {
+    console.clear();
+  }
+
   private static compose(
     who: DialoguerType,
     message: string,
@@ -87,7 +91,7 @@ export class Dialoguer {
   }
 
   private static formatTag(who: DialoguerType, nameOverride?: string): string {
-    const label = `[${who}]`;
+    const label = `${who.charAt(0).toUpperCase()}${who.slice(1).toLowerCase()}`;
 
     switch (who) {
       case DialoguerType.GAME:

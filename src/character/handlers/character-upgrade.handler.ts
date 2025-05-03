@@ -15,18 +15,12 @@ import { Character } from '..';
 
 export class CharacterUpgradeHandler implements Handler<Character, void> {
   handle(character: Character): void {
-    character.maxHp = Math.round(
-      BASE_HP + character.level * character.vit * HP_PER_VIT,
-    );
-    character.maxMp = Math.round(
-      BASE_MP + character.level * character.int * MP_PER_INT,
-    );
+    character.maxHp = Math.round(BASE_HP + character.vit * HP_PER_VIT);
+    character.maxMp = Math.round(BASE_MP + character.int * MP_PER_INT);
 
-    character.eva = Math.round(character.level * character.dex * EVA_PER_DEX);
-    character.ctr = Math.round(character.level * character.luk * CTR_PER_LUK);
-    character.dmg = Math.round(
-      BASE_DMG + character.level * character.str * DMG_PER_STR,
-    );
+    character.eva = parseFloat((character.dex * EVA_PER_DEX).toFixed(2));
+    character.ctr = parseFloat((character.luk * CTR_PER_LUK).toFixed(2));
+    character.dmg = Math.round(BASE_DMG + character.str * DMG_PER_STR);
 
     character.hp = Math.round(character.maxHp);
     character.mp = Math.round(character.maxMp);

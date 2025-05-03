@@ -8,6 +8,7 @@ import {
   SceneHandler,
 } from '@game/scenes';
 
+import { Dialoguer } from '@game/common/dialoguer';
 import { template } from '@game/common/template';
 
 import { GAME_TEXTS } from './constants/texts';
@@ -42,6 +43,7 @@ export class GameManager {
   };
 
   static changeScene<Input>(name: GameManagerSceneName, param?: Input): void {
+    Dialoguer.clear();
     this.scenes[name].handle(param);
   }
 
