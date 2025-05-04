@@ -8,18 +8,26 @@ import {
   CombatAttackCritMessageText,
   CombatAttackMessageText,
   CombatEvadeMessageText,
+  CombatTurnMessageText,
 } from '@game/engine/types/texts.types';
 
 import { Enemy } from '@game/npc/enemy';
 
+import { SlashAttackHandler } from './special-powers/slash-attack.handler';
+import { SpecialPowerIsAvailableHandler } from './special-powers/special-power-is-available.handler';
+
+import { CharacterSpecialPower } from '../types/special-power.types';
+
+type Owner = 'enemy' | 'character';
+
 export type FightReport = {
-  winner: 'character' | 'enemy';
+  winner: Owner;
   expPointsEarned: number;
   goldEarned: number;
   logs: FightReportLog[];
 };
 
-type FightReportLog = {
+export type FightReportLog = {
   who: DialoguerType;
   message: string;
   enemyName?: string;
@@ -30,29 +38,55 @@ type CharacterFightHandlerInput = {
   enemies: Enemy[];
 };
 
-type Owner = 'enemy' | 'character';
-
 export class CharacterFightHandler
   implements Handler<CharacterFightHandlerInput, FightReport>
 {
+  private readonly isSpecialPowerAvailable =
+    new SpecialPowerIsAvailableHandler();
+
+  private readonly specialPowers = {
+    [CharacterSpecialPower.SLASH_ATTACK]: new SlashAttackHandler(),
+  };
+
   handle({ character, enemies }: CharacterFightHandlerInput): FightReport {
     const logs: FightReportLog[] = [];
-    const aliveEnemies = [...enemies];
+    let aliveEnemies = [...enemies];
+
+    let currentTurn = 1;
 
     while (character.hp > 0 && aliveEnemies.length > 0) {
-      const targetEnemy = aliveEnemies[0];
+      this.updateMessageTurn(currentTurn, logs);
 
-      this.executeCharacterAttackTurn(character, targetEnemy, logs);
+      if (
+        this.isSpecialPowerAvailable.handle({
+          character,
+          specialPower: CharacterSpecialPower.SLASH_ATTACK,
+          currentTurn,
+        })
+      ) {
+        this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
+          character,
+          enemies,
+          logs,
+        });
 
-      if (!targetEnemy.isAlive()) {
-        aliveEnemies.shift();
+        aliveEnemies = aliveEnemies.filter((enemy) => enemy.isAlive());
+      } else {
+        const targetEnemy = aliveEnemies[0];
+        this.executeCharacterAttackTurn(character, targetEnemy, logs);
+
+        if (!targetEnemy.isAlive()) {
+          aliveEnemies.shift();
+        }
       }
 
       for (const enemy of aliveEnemies) {
-        if (enemy.isAlive() && character.hp > 0) {
+        if (character.hp > 0) {
           this.executeEnemyAttackTurn(enemy, character, logs);
         }
       }
+
+      currentTurn++;
     }
 
     return this.buildFightReport(character, enemies, logs);
@@ -136,6 +170,15 @@ export class CharacterFightHandler
       defenderName: defender.name,
       dmg: damage,
       hp: defender.hp,
+    });
+  }
+
+  private updateMessageTurn(turn: number, logs: FightReportLog[]): void {
+    logs.push({
+      who: DialoguerType.GAME,
+      message: GameManager.getMessage<CombatTurnMessageText>('COMBAT_TURN', {
+        turn,
+      }),
     });
   }
 

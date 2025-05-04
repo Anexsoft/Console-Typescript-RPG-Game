@@ -5,7 +5,7 @@ export const GAME_TEXTS = {
 
   /* COMBAT */
   COMBAT_EVADE:
-    'tries to strike, but [c:magenta]{{defenderName}}[/] swiftly dodges the attack.',
+    'tries to strike, but [c:magenta]{{defenderName}}[/] swiftly dodges the attack',
   COMBAT_ATTACK:
     'attacks [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]. Remaining HP: [c:grey]{{hp}}[/]',
   COMBAT_ATTACK_CRIT:
@@ -13,20 +13,24 @@ export const GAME_TEXTS = {
   COMBAT_WIN:
     'you defeated the enemy and earned [c:green]{{expPointsEarned}} experience points[/]!',
   COMBAT_WIN_GOLD:
-    'you also found [c:yellow]{{goldEarned}} gold coins[/] on the battlefield.',
+    'you also found [c:yellow]{{goldEarned}} gold coins[/] on the battlefield',
   COMBAT_LOSE: 'you were defeated in battle. Train harder and try again!',
   COMBAT_ENEMY_APPEAR: 'a wild {{enemyName}} appears, ready to fight!',
-  COMBAT_TURN: 'current turn is {{turn}}',
+  COMBAT_TURN: '--------- turn {{turn}} begins ---------',
 
   /* SPECIAL POWERS */
   SPECIAL_POWER_SLASH_ATTACK:
-    'unleashes a devastating [c:yellow]SLASH ATTACK[/] to all enemies in place!',
+    'unleashes [c:yellow]Slash Attack[/] on all enemies, dealing [c:red]{{dmg}} damage[/] each!',
 
   /* CHARACTER */
-  CHARACTER_STATUS:
+  CHARACTER_CURRENT_STATUS:
     'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',
+  CHARACTER_CURRENT_GOLD:
+    'you currently carry [c:yellow]{{gold}} gold coins[/]',
+  CHARACTER_LEVEL_UP_PENDING:
+    'you need [c:cyan]{{pendingExperience}} experience points[/] to reach [c:green]level {{newLevel}}[/]',
   CHARACTER_NEW_LEVEL_REACHED:
-    '🎉 you leveled up! You are now level {{newLevel}}.',
+    '🎉 you leveled up! You are now [c:green]level {{newLevel}}[/]!',
 
   /* ENEMY */
   ENEMY_STATUS:
@@ -49,9 +53,9 @@ export const GAME_TEXTS = {
   TOWN_GO_TO_HUNT: 'you prepare for a hunt. Stay alert...',
 
   /* SCENE > TOWN > INN */
-  TOWN_INN_RESTED: 'you slept peacefully and feel [c:green]fully restored[/].',
+  TOWN_INN_RESTED: 'you slept peacefully and feel [c:green]fully restored[/]',
 
   /* SCENE > COMBAT */
   COMBAT_ENTERING_MESSAGE:
-    'You have entered [c:magenta]{{locationName}}[/]. Be careful...',
+    'you have entered [c:magenta]{{locationName}}[/]. Be careful...',
 };

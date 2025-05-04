@@ -11,6 +11,8 @@ import {
 import { Dialoguer } from '@game/common/dialoguer';
 import { template } from '@game/common/template';
 
+import { CharacterScene } from '@game/scenes/character';
+
 import { GAME_TEXTS } from './constants/texts';
 import { GAME_TEXTS_TYPES } from './types/texts.types';
 
@@ -21,6 +23,7 @@ export enum GameManagerSceneName {
   StoreScene,
   TavernScene,
   CombatScene,
+  CharacterScene,
 }
 
 type GameManagerScene = {
@@ -30,6 +33,7 @@ type GameManagerScene = {
   [GameManagerSceneName.StoreScene]: SceneHandler;
   [GameManagerSceneName.TavernScene]: SceneHandler;
   [GameManagerSceneName.CombatScene]: SceneHandler;
+  [GameManagerSceneName.CharacterScene]: SceneHandler;
 };
 
 export class GameManager {
@@ -40,6 +44,7 @@ export class GameManager {
     [GameManagerSceneName.StoreScene]: new StoreScene(),
     [GameManagerSceneName.TavernScene]: new TavernScene(),
     [GameManagerSceneName.CombatScene]: new CombatScene(),
+    [GameManagerSceneName.CharacterScene]: new CharacterScene(),
   };
 
   static changeScene<Input>(name: GameManagerSceneName, param?: Input): void {

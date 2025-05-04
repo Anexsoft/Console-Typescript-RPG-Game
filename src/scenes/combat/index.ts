@@ -8,7 +8,7 @@ import { GameManager, GameManagerSceneName } from '@game/engine/game.manager';
 import { GameState } from '@game/engine/game.state';
 import {
   CharacterNewLevelReachedMessageText,
-  CharacterStatusMessageText,
+  CharacterCurrentStatusMessageText,
   CombatEnemyAppearMessageText,
   CombatEnteringMessageText,
   CombatWinGoldMessageText,
@@ -21,6 +21,7 @@ import {
   CharacterFightHandler,
   FightReport,
 } from '@game/character/handlers/character-fight.handler';
+import { CharacterGoldHandler } from '@game/character/handlers/character-gold.handle';
 import { CharacterLevelProgressHandler } from '@game/character/handlers/character-level-progress.handler';
 import { CharacterUpdateHandler } from '@game/character/handlers/character-update.handler';
 import { CharacterUpgradeHandler } from '@game/character/handlers/character-upgrade.handler';
@@ -43,6 +44,7 @@ export class CombatScene implements SceneHandler {
     new CharacterLevelProgressHandler();
   private readonly characterUpgradeHandler = new CharacterUpgradeHandler();
   private readonly characterUpdateHandler = new CharacterUpdateHandler();
+  private readonly characterGoldHandler = new CharacterGoldHandler();
 
   async handle({ location }: CombatSceneInput): Promise<void> {
     const character = GameState.character;
@@ -63,7 +65,11 @@ export class CombatScene implements SceneHandler {
 
     await this.printLogs(report);
 
-    await this.updatePlayerProgress(character, report.expPointsEarned);
+    await this.updatePlayerProgress(
+      character,
+      report.expPointsEarned,
+      report.goldEarned,
+    );
 
     if (report.winner === 'character') {
       GameManager.changeScene(GameManagerSceneName.TownScene);
@@ -138,19 +144,26 @@ export class CombatScene implements SceneHandler {
   private async updatePlayerProgress(
     character: Character,
     newExpPoints: number,
+    goldEarned: number,
   ): Promise<void> {
-    const { newLevelReached, newLevel, levelsGained } =
+    this.characterGoldHandler.handle({
+      character,
+      gold: goldEarned,
+      action: 'increase',
+    });
+
+    const { isNewLevelReached, levelsGained } =
       this.characterLevelProgressHandler.handle({
         character,
         newExpPoints,
       });
 
-    if (newLevelReached) {
+    if (isNewLevelReached) {
       await Dialoguer.send({
         who: DialoguerType.GAME,
         message: GameManager.getMessage<CharacterNewLevelReachedMessageText>(
           'CHARACTER_NEW_LEVEL_REACHED',
-          { newLevel },
+          { newLevel: character.level },
         ),
       });
 
@@ -161,8 +174,8 @@ export class CombatScene implements SceneHandler {
 
     await Dialoguer.send({
       who: DialoguerType.PLAYER,
-      message: GameManager.getMessage<CharacterStatusMessageText>(
-        'CHARACTER_STATUS',
+      message: GameManager.getMessage<CharacterCurrentStatusMessageText>(
+        'CHARACTER_CURRENT_STATUS',
         { ...character },
       ),
     });

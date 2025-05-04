@@ -10,6 +10,7 @@ enum TownSceneAction {
   STORE,
   TAVERN,
   HUNT,
+  CHARACTER,
 }
 
 export class TownScene implements SceneHandler {
@@ -20,6 +21,7 @@ export class TownScene implements SceneHandler {
       options: {
         type: 'select',
         choices: [
+          { name: 'Character stats', value: TownSceneAction.CHARACTER },
           { name: 'Rest at the inn', value: TownSceneAction.INN },
           { name: 'Visit the store', value: TownSceneAction.STORE },
           { name: 'Enter the tavern', value: TownSceneAction.TAVERN },
@@ -29,7 +31,7 @@ export class TownScene implements SceneHandler {
     });
 
     if (action === TownSceneAction.HUNT) {
-      await this.changeToCombatSceneOnSelectedPlace();
+      await this.changeToCombatSceneOnSelectedHuntingLocation();
     } else {
       await this.changeSceneOnSelectedAction(action);
     }
@@ -43,10 +45,12 @@ export class TownScene implements SceneHandler {
         return GameManager.getMessage('TOWN_GO_TO_STORE');
       case TownSceneAction.TAVERN:
         return GameManager.getMessage('TOWN_GO_TO_TAVERN');
+      default:
+        return '';
     }
   }
 
-  async changeToCombatSceneOnSelectedPlace(): Promise<void> {
+  async changeToCombatSceneOnSelectedHuntingLocation(): Promise<void> {
     const location = await Dialoguer.send<TownSceneAction>({
       who: DialoguerType.GAME,
       message: GameManager.getMessage('TOWN_GO_TO_HUNT'),
@@ -101,20 +105,36 @@ export class TownScene implements SceneHandler {
   }
 
   async changeSceneOnSelectedAction(action: TownSceneAction): Promise<void> {
-    await Dialoguer.send({
-      who: DialoguerType.GAME,
-      message: this.getActionMessage(action),
-    });
-
     switch (action) {
       case TownSceneAction.INN:
+        await Dialoguer.send({
+          who: DialoguerType.GAME,
+          message: GameManager.getMessage('TOWN_GO_TO_INN'),
+        });
+
         GameManager.changeScene(GameManagerSceneName.InnScene);
         break;
+
       case TownSceneAction.STORE:
+        await Dialoguer.send({
+          who: DialoguerType.GAME,
+          message: GameManager.getMessage('TOWN_GO_TO_STORE'),
+        });
+
         GameManager.changeScene(GameManagerSceneName.StoreScene);
         break;
+
       case TownSceneAction.TAVERN:
+        await Dialoguer.send({
+          who: DialoguerType.GAME,
+          message: GameManager.getMessage('TOWN_GO_TO_TAVERN'),
+        });
+
         GameManager.changeScene(GameManagerSceneName.TavernScene);
+        break;
+
+      case TownSceneAction.CHARACTER:
+        GameManager.changeScene(GameManagerSceneName.CharacterScene);
         break;
     }
   }

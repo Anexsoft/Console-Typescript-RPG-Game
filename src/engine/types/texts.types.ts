@@ -41,8 +41,14 @@ export type CombatTurnMessageText = {
   turn: number;
 };
 
+/* SPECIAL POWERS */
+
+export type SpecialPowerSlashAttackMessageText = {
+  dmg: number;
+};
+
 /* CHARACTER */
-export type CharacterStatusMessageText = {
+export type CharacterCurrentStatusMessageText = {
   level: number;
   hp: number;
   mp: number;
@@ -51,8 +57,17 @@ export type CharacterStatusMessageText = {
   exp: number;
 };
 
+export type CharacterCurrentGoldMessageText = {
+  gold: number;
+};
+
 export type CharacterNewLevelReachedMessageText = {
   newLevel: number;
+};
+
+export type CharacterLevelUpPendingMessageText = {
+  newLevel: number;
+  pendingExperience: number;
 };
 
 /* ENEMY */
