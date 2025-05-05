@@ -19,6 +19,11 @@ export const GAME_TEXTS = {
   COMBAT_TURN: '--------- turn {{turn}} begins ---------',
 
   /* SPECIAL POWERS */
+  SPECIAL_POWER_DRAGONS_BREATH:
+    "unleashes the lethal [c:yellow]Dragon's Breath[/], incinerating all enemies for [c:red]{{dmg}} damage[/] each!",
+  SPECIAL_POWER_CRITICAL_DRAGONS_BREATH:
+    "[c:yellow]CRITICAL Dragon's Breath[/] engulfs all enemies in flames, dealing a devastating [c:red]{{dmg}} damage[/] each!",
+
   SPECIAL_POWER_SLASH_ATTACK:
     'unleashes [c:yellow]Slash Attack[/] on all enemies, dealing [c:red]{{dmg}} damage[/] each!',
   SPECIAL_POWER_CRITICAL_SLASH_ATTACK:
@@ -38,6 +43,8 @@ export const GAME_TEXTS = {
     'you need [c:cyan]{{pendingExperience}} experience points[/] to reach [c:green]level {{newLevel}}[/]',
   CHARACTER_NEW_LEVEL_REACHED:
     '🎉 you leveled up! You are now [c:green]level {{newLevel}}[/]!',
+  CHARACTER_MAX_LEVEL_REACHED:
+    'you have reached the maximum level. No further progression is possible',
 
   /* ENEMY */
   ENEMY_STATUS:
@@ -46,9 +53,9 @@ export const GAME_TEXTS = {
   /* SCENE > MAIN */
   MAIN_WELCOME: '🌟 welcome to your console RPG adventure 🌟',
   MAIN_WELCOME_INTRO:
-    'you awaken in a dark castle... The wind howls and the moon lights the sky.',
+    'you awaken in a dark castle... The wind howls and the moon lights the sky',
   MAIN_CHARACTER_NAME: 'what is the name of your character?',
-  MAIN_CHARACTER_CREATION: 'your character {{characterName}} has been created.',
+  MAIN_CHARACTER_CREATION: 'your character {{characterName}} has been created',
   MAIN_CHARACTER_WELCOME_BACK:
     '🎮 welcome back, {{characterName}}! Your journey continues...',
 

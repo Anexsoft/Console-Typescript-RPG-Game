@@ -10,6 +10,7 @@ import { Enemy } from '@game/npc/enemy';
 import { EnemyAttackHandler } from '@game/npc/enemy/handlers/features/enemy-attack.handler';
 
 import { CharacterAttackHandler } from './features/character-attack.handler';
+import { DragonsBreathHandler } from './special-powers/dragons-breath.handler';
 import { PiercingStrikeHandler } from './special-powers/piercing-strike.handler';
 import { SlashAttackHandler } from './special-powers/slash-attack.handler';
 import { SpecialPowerIsAvailableHandler } from './special-powers/special-power-is-available.handler';
@@ -46,6 +47,7 @@ export class CharacterFightHandler
     new SpecialPowerIsAvailableHandler();
 
   private readonly specialPowers = {
+    [CharacterSpecialPower.DRAGONS_BREATH]: new DragonsBreathHandler(),
     [CharacterSpecialPower.SLASH_ATTACK]: new SlashAttackHandler(),
     [CharacterSpecialPower.PIERCING_STRIKE]: new PiercingStrikeHandler(),
   };
@@ -112,6 +114,14 @@ export class CharacterFightHandler
     });
 
     if (isEnabled) {
+      if (character.specialPower === CharacterSpecialPower.DRAGONS_BREATH) {
+        this.specialPowers[CharacterSpecialPower.DRAGONS_BREATH].handle({
+          character,
+          enemies,
+          logs,
+        });
+      }
+
       if (character.specialPower === CharacterSpecialPower.SLASH_ATTACK) {
         this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
           character,

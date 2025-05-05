@@ -1,42 +1,27 @@
 export enum CharacterSpecialPower {
   SLASH_ATTACK = 'SLASH_ATTACK',
   PIERCING_STRIKE = 'PIERCING_STRIKE',
+  DRAGONS_BREATH = 'DRAGONS_BREATH',
 }
 
-export type CharacterSpecialPowerEffect = {
-  damageMultiplier?: number;
-  targets?: 'allEnemies' | 'singleEnemy' | 'self' | 'allAllies';
-  statusEffect?: 'stun' | 'burn' | 'poison' | 'heal' | 'none';
+export type CharacterSpecialMultiplierPowerEffect = {
+  damageMultiplier: number;
 };
 
-export type CharacterSpecialPowerData = {
+export type CharacterSpecialEnemyLifePowerEffect = {
+  minDamagePercent: number;
+  baseDamage: number;
+};
+
+export type CharacterSpecialPowerData<EffectType> = {
   mp: number;
   cooldownTurns: number;
   description: string;
-  effect: CharacterSpecialPowerEffect;
+  effect: EffectType;
 };
 
-export const CHARACTER_SPECIAL_POWER_COSTS: Record<
-  CharacterSpecialPower,
-  CharacterSpecialPowerData
-> = {
-  [CharacterSpecialPower.SLASH_ATTACK]: {
-    mp: 5,
-    cooldownTurns: 3,
-    description: 'Deals % damage to all enemies',
-    effect: {
-      damageMultiplier: 1.5,
-      targets: 'allEnemies',
-    },
-  },
-  [CharacterSpecialPower.PIERCING_STRIKE]: {
-    mp: 7,
-    cooldownTurns: 2,
-    description:
-      'A precise strike that deals double damage and cannot be evaded.',
-    effect: {
-      damageMultiplier: 2.0,
-      targets: 'singleEnemy',
-    },
-  },
+export type CharacterSpecialPowerCosts = {
+  [CharacterSpecialPower.DRAGONS_BREATH]: CharacterSpecialPowerData<CharacterSpecialEnemyLifePowerEffect>;
+  [CharacterSpecialPower.SLASH_ATTACK]: CharacterSpecialPowerData<CharacterSpecialMultiplierPowerEffect>;
+  [CharacterSpecialPower.PIERCING_STRIKE]: CharacterSpecialPowerData<CharacterSpecialMultiplierPowerEffect>;
 };

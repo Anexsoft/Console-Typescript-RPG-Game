@@ -10,10 +10,8 @@ import {
   SpecialPowerSlashAttackMessageText,
 } from '@game/engine/types/texts.types';
 
-import {
-  CHARACTER_SPECIAL_POWER_COSTS,
-  CharacterSpecialPower,
-} from '@game/character/types/special-power.types';
+import { CHARACTER_SPECIAL_POWER_COSTS } from '@game/character/types/special-power-costs.types';
+import { CharacterSpecialPower } from '@game/character/types/special-power.types';
 
 import { Enemy } from '@game/npc/enemy';
 

@@ -21,7 +21,7 @@ export class TownScene implements SceneHandler {
       options: {
         type: 'select',
         choices: [
-          { name: 'Character stats', value: TownSceneAction.CHARACTER },
+          { name: 'Character info', value: TownSceneAction.CHARACTER },
           { name: 'Rest at the inn', value: TownSceneAction.INN },
           { name: 'Visit the store', value: TownSceneAction.STORE },
           { name: 'Enter the tavern', value: TownSceneAction.TAVERN },

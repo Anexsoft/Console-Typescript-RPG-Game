@@ -1,12 +1,9 @@
 import { Character } from '@game/character';
 
-import { CriticalHandler } from '@game/common/handlers/critical.handler';
 import { Handler } from '@game/common/interfaces/handler.interfacer';
 
-import {
-  CHARACTER_SPECIAL_POWER_COSTS,
-  CharacterSpecialPower,
-} from '@game/character/types/special-power.types';
+import { CHARACTER_SPECIAL_POWER_COSTS } from '@game/character/types/special-power-costs.types';
+import { CharacterSpecialPower } from '@game/character/types/special-power.types';
 
 export type SpecialPowerIsAvailableHandlerInput = {
   specialPower: CharacterSpecialPower;
@@ -17,8 +14,6 @@ export type SpecialPowerIsAvailableHandlerInput = {
 export class SpecialPowerIsAvailableHandler
   implements Handler<SpecialPowerIsAvailableHandlerInput, void>
 {
-  private readonly criticalHandler = new CriticalHandler();
-
   handle({
     character,
     specialPower,
