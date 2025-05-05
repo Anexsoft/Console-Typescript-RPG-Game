@@ -1,8 +1,6 @@
 import { Character } from '@game/character';
 
 import { DialoguerType } from '@game/common/dialoguer';
-import { CriticalHandler } from '@game/common/handlers/critical.handler';
-import { EvadeHandler } from '@game/common/handlers/evade.handler';
 import { Handler } from '@game/common/interfaces/handler.interfacer';
 
 import { GameManager } from '@game/engine/game.manager';
@@ -12,6 +10,7 @@ import { Enemy } from '@game/npc/enemy';
 import { EnemyAttackHandler } from '@game/npc/enemy/handlers/features/enemy-attack.handler';
 
 import { CharacterAttackHandler } from './features/character-attack.handler';
+import { PiercingStrikeHandler } from './special-powers/piercing-strike.handler';
 import { SlashAttackHandler } from './special-powers/slash-attack.handler';
 import { SpecialPowerIsAvailableHandler } from './special-powers/special-power-is-available.handler';
 
@@ -46,11 +45,9 @@ export class CharacterFightHandler
   private readonly isSpecialPowerAvailable =
     new SpecialPowerIsAvailableHandler();
 
-  private readonly criticalHandler = new CriticalHandler();
-  private readonly evadeHandler = new EvadeHandler();
-
   private readonly specialPowers = {
     [CharacterSpecialPower.SLASH_ATTACK]: new SlashAttackHandler(),
+    [CharacterSpecialPower.PIERCING_STRIKE]: new PiercingStrikeHandler(),
   };
 
   handle({ character, enemies }: CharacterFightHandlerInput): FightReport {
@@ -62,6 +59,9 @@ export class CharacterFightHandler
     while (character.hp > 0 && aliveEnemies.length > 0) {
       this.updateMessageTurn(currentTurn, logs);
 
+      aliveEnemies.sort((a, b) => a.hp - b.hp);
+      const targetEnemy = aliveEnemies[0];
+
       if (
         !this.tryToExecuteCharacterSpecialAttackTurn(
           character,
@@ -71,9 +71,6 @@ export class CharacterFightHandler
           logs,
         )
       ) {
-        aliveEnemies.sort((a, b) => a.hp - b.hp);
-        const targetEnemy = aliveEnemies[0];
-
         this.characterAttackHandler.handle({
           attacker: character,
           defender: targetEnemy,
@@ -110,16 +107,26 @@ export class CharacterFightHandler
   ): boolean {
     const isEnabled = this.isSpecialPowerAvailable.handle({
       character,
-      specialPower: CharacterSpecialPower.SLASH_ATTACK,
+      specialPower: character.specialPower,
       currentTurn,
     });
 
     if (isEnabled) {
-      this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
-        character,
-        enemies,
-        logs,
-      });
+      if (character.specialPower === CharacterSpecialPower.SLASH_ATTACK) {
+        this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
+          character,
+          enemies,
+          logs,
+        });
+      }
+
+      if (character.specialPower === CharacterSpecialPower.PIERCING_STRIKE) {
+        this.specialPowers[CharacterSpecialPower.PIERCING_STRIKE].handle({
+          character,
+          enemy: enemies[0],
+          logs,
+        });
+      }
 
       for (let i = aliveEnemies.length - 1; i >= 0; i--) {
         if (!aliveEnemies[i].isAlive()) {

@@ -50,6 +50,18 @@ export type SpecialPowerCriticalSlashAttackMessageText = {
   dmg: number;
 };
 
+export type SpecialPowerPiercingStrikeMessageText = {
+  enemyName: string;
+  dmg: number;
+  hp: number;
+};
+
+export type SpecialPowerCriticalPiercingStrikeMessageText = {
+  enemyName: string;
+  dmg: number;
+  hp: number;
+};
+
 /* CHARACTER */
 export type CharacterCurrentStatusMessageText = {
   level: number;

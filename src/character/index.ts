@@ -2,6 +2,8 @@ import { ObjectId } from 'mongodb';
 
 import { STR, VIT, INT, DEX, LUK } from '@game/engine/constants/character';
 
+import { CharacterSpecialPower } from './types/special-power.types';
+
 export class Character {
   /** MongoDB ObjectId */
   _id?: ObjectId;
@@ -53,6 +55,8 @@ export class Character {
 
   /** Physical damage – calculated from strength (STR). */
   dmg: number = 0;
+
+  specialPower: CharacterSpecialPower;
 
   constructor(name: string) {
     this.name = name;

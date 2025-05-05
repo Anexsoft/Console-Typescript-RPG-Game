@@ -24,6 +24,11 @@ export const GAME_TEXTS = {
   SPECIAL_POWER_CRITICAL_SLASH_ATTACK:
     'unleashes a devastating [c:yellow]CRITICAL Slash Attack[/], hitting all enemies with [c:red]{{dmg}} damage[/] each!',
 
+  SPECIAL_POWER_PIERCING_STRIKE:
+    'uses [c:yellow]Piercing Strike[/] and deals [c:red]{{dmg}} damage[/] to [c:magenta]{{enemyName}}[/]!. Remaining HP: [c:grey]{{hp}}[/]',
+  SPECIAL_POWER_CRITICAL_PIERCING_STRIKE:
+    'uses a deadly [c:yellow]CRITICAL Piercing Strike[/], inflicting [c:red]{{dmg}} damage[/] on [c:magenta]{{enemyName}}[/]!. Remaining HP: [c:grey]{{hp}}[/]',
+
   /* CHARACTER */
   CHARACTER_CURRENT_STATUS:
     'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',

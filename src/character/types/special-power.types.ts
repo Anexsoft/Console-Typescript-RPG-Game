@@ -1,8 +1,7 @@
 export enum CharacterSpecialPower {
-  SLASH_ATTACK = 'Slash Attack',
+  SLASH_ATTACK = 'SLASH_ATTACK',
+  PIERCING_STRIKE = 'PIERCING_STRIKE',
 }
-
-export type CharacterSpecialPowerType = 'area' | 'single' | 'buff' | 'debuff';
 
 export type CharacterSpecialPowerEffect = {
   damageMultiplier?: number;
@@ -13,7 +12,6 @@ export type CharacterSpecialPowerEffect = {
 export type CharacterSpecialPowerData = {
   mp: number;
   cooldownTurns: number;
-  type: CharacterSpecialPowerType;
   description: string;
   effect: CharacterSpecialPowerEffect;
 };
@@ -25,11 +23,20 @@ export const CHARACTER_SPECIAL_POWER_COSTS: Record<
   [CharacterSpecialPower.SLASH_ATTACK]: {
     mp: 5,
     cooldownTurns: 3,
-    type: 'area',
     description: 'Deals % damage to all enemies',
     effect: {
       damageMultiplier: 1.5,
       targets: 'allEnemies',
+    },
+  },
+  [CharacterSpecialPower.PIERCING_STRIKE]: {
+    mp: 7,
+    cooldownTurns: 2,
+    description:
+      'A precise strike that deals double damage and cannot be evaded.',
+    effect: {
+      damageMultiplier: 2.0,
+      targets: 'singleEnemy',
     },
   },
 };
