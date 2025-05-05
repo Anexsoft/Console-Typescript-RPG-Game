@@ -42,8 +42,11 @@ export type CombatTurnMessageText = {
 };
 
 /* SPECIAL POWERS */
-
 export type SpecialPowerSlashAttackMessageText = {
+  dmg: number;
+};
+
+export type SpecialPowerCriticalSlashAttackMessageText = {
   dmg: number;
 };
 

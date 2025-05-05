@@ -21,6 +21,8 @@ export const GAME_TEXTS = {
   /* SPECIAL POWERS */
   SPECIAL_POWER_SLASH_ATTACK:
     'unleashes [c:yellow]Slash Attack[/] on all enemies, dealing [c:red]{{dmg}} damage[/] each!',
+  SPECIAL_POWER_CRITICAL_SLASH_ATTACK:
+    'unleashes a devastating [c:yellow]CRITICAL Slash Attack[/], hitting all enemies with [c:red]{{dmg}} damage[/] each!',
 
   /* CHARACTER */
   CHARACTER_CURRENT_STATUS:

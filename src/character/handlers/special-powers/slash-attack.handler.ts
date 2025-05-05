@@ -1,10 +1,14 @@
 import { Character } from '@game/character';
 
 import { DialoguerType } from '@game/common/dialoguer';
+import { CriticalHandler } from '@game/common/handlers/critical.handler';
 import { Handler } from '@game/common/interfaces/handler.interfacer';
 
 import { GameManager } from '@game/engine/game.manager';
-import { SpecialPowerSlashAttackMessageText } from '@game/engine/types/texts.types';
+import {
+  SpecialPowerCriticalSlashAttackMessageText,
+  SpecialPowerSlashAttackMessageText,
+} from '@game/engine/types/texts.types';
 
 import {
   CHARACTER_SPECIAL_POWER_COSTS,
@@ -24,28 +28,48 @@ export type SlashAttackHandlerInput = {
 export class SlashAttackHandler
   implements Handler<SlashAttackHandlerInput, void>
 {
+  private readonly criticalHandler = new CriticalHandler();
+
   handle({ character, enemies, logs }: SlashAttackHandlerInput): void {
     const powerData =
       CHARACTER_SPECIAL_POWER_COSTS[CharacterSpecialPower.SLASH_ATTACK];
 
     character.mp -= powerData.mp;
 
-    const damage = Math.floor(
-      character.dmg * (powerData.effect.damageMultiplier || 1),
+    const { isCritical, damage } = this.criticalHandler.handle({
+      ctr: character.ctr,
+      dmg: character.dmg,
+    });
+
+    const finalDamage = Math.floor(
+      damage * (powerData.effect.damageMultiplier || 1),
     );
 
     enemies.forEach((enemy) => {
-      enemy.takeDamage(damage);
+      enemy.takeDamage(finalDamage);
     });
 
-    logs.push({
-      who: DialoguerType.PLAYER,
-      message: GameManager.getMessage<SpecialPowerSlashAttackMessageText>(
-        'SPECIAL_POWER_SLASH_ATTACK',
-        {
-          dmg: damage,
-        },
-      ),
-    });
+    if (isCritical) {
+      logs.push({
+        who: DialoguerType.PLAYER,
+        message:
+          GameManager.getMessage<SpecialPowerCriticalSlashAttackMessageText>(
+            'SPECIAL_POWER_CRITICAL_SLASH_ATTACK',
+            {
+              dmg: finalDamage,
+            },
+          ),
+      });
+    } else {
+      logs.push({
+        who: DialoguerType.PLAYER,
+        message: GameManager.getMessage<SpecialPowerSlashAttackMessageText>(
+          'SPECIAL_POWER_SLASH_ATTACK',
+          {
+            dmg: finalDamage,
+          },
+        ),
+      });
+    }
   }
 }

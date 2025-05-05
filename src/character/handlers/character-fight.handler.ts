@@ -1,18 +1,17 @@
 import { Character } from '@game/character';
 
 import { DialoguerType } from '@game/common/dialoguer';
+import { CriticalHandler } from '@game/common/handlers/critical.handler';
+import { EvadeHandler } from '@game/common/handlers/evade.handler';
 import { Handler } from '@game/common/interfaces/handler.interfacer';
 
 import { GameManager } from '@game/engine/game.manager';
-import {
-  CombatAttackCritMessageText,
-  CombatAttackMessageText,
-  CombatEvadeMessageText,
-  CombatTurnMessageText,
-} from '@game/engine/types/texts.types';
+import { CombatTurnMessageText } from '@game/engine/types/texts.types';
 
 import { Enemy } from '@game/npc/enemy';
+import { EnemyAttackHandler } from '@game/npc/enemy/handlers/features/enemy-attack.handler';
 
+import { CharacterAttackHandler } from './features/character-attack.handler';
 import { SlashAttackHandler } from './special-powers/slash-attack.handler';
 import { SpecialPowerIsAvailableHandler } from './special-powers/special-power-is-available.handler';
 
@@ -41,8 +40,14 @@ type CharacterFightHandlerInput = {
 export class CharacterFightHandler
   implements Handler<CharacterFightHandlerInput, FightReport>
 {
+  private readonly characterAttackHandler = new CharacterAttackHandler();
+  private readonly enemyAttackHandler = new EnemyAttackHandler();
+
   private readonly isSpecialPowerAvailable =
     new SpecialPowerIsAvailableHandler();
+
+  private readonly criticalHandler = new CriticalHandler();
+  private readonly evadeHandler = new EvadeHandler();
 
   private readonly specialPowers = {
     [CharacterSpecialPower.SLASH_ATTACK]: new SlashAttackHandler(),
@@ -50,7 +55,7 @@ export class CharacterFightHandler
 
   handle({ character, enemies }: CharacterFightHandlerInput): FightReport {
     const logs: FightReportLog[] = [];
-    let aliveEnemies = [...enemies];
+    const aliveEnemies = [...enemies];
 
     let currentTurn = 1;
 
@@ -58,22 +63,22 @@ export class CharacterFightHandler
       this.updateMessageTurn(currentTurn, logs);
 
       if (
-        this.isSpecialPowerAvailable.handle({
-          character,
-          specialPower: CharacterSpecialPower.SLASH_ATTACK,
-          currentTurn,
-        })
-      ) {
-        this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
+        !this.tryToExecuteCharacterSpecialAttackTurn(
           character,
           enemies,
+          aliveEnemies,
+          currentTurn,
+          logs,
+        )
+      ) {
+        aliveEnemies.sort((a, b) => a.hp - b.hp);
+        const targetEnemy = aliveEnemies[0];
+
+        this.characterAttackHandler.handle({
+          attacker: character,
+          defender: targetEnemy,
           logs,
         });
-
-        aliveEnemies = aliveEnemies.filter((enemy) => enemy.isAlive());
-      } else {
-        const targetEnemy = aliveEnemies[0];
-        this.executeCharacterAttackTurn(character, targetEnemy, logs);
 
         if (!targetEnemy.isAlive()) {
           aliveEnemies.shift();
@@ -82,7 +87,11 @@ export class CharacterFightHandler
 
       for (const enemy of aliveEnemies) {
         if (character.hp > 0) {
-          this.executeEnemyAttackTurn(enemy, character, logs);
+          this.enemyAttackHandler.handle({
+            attacker: enemy,
+            defender: character,
+            logs,
+          });
         }
       }
 
@@ -92,85 +101,34 @@ export class CharacterFightHandler
     return this.buildFightReport(character, enemies, logs);
   }
 
-  private executeCharacterAttackTurn(
-    attacker: Character,
-    defender: Enemy,
+  private tryToExecuteCharacterSpecialAttackTurn(
+    character: Character,
+    enemies: Enemy[],
+    aliveEnemies: Enemy[],
+    currentTurn: number,
     logs: FightReportLog[],
-  ): void {
-    if (this.didEvade(defender)) {
-      logs.push({
-        who: DialoguerType.PLAYER,
-        message: this.getEvadeMessage(defender),
+  ): boolean {
+    const isEnabled = this.isSpecialPowerAvailable.handle({
+      character,
+      specialPower: CharacterSpecialPower.SLASH_ATTACK,
+      currentTurn,
+    });
+
+    if (isEnabled) {
+      this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
+        character,
+        enemies,
+        logs,
       });
-      return;
+
+      for (let i = aliveEnemies.length - 1; i >= 0; i--) {
+        if (!aliveEnemies[i].isAlive()) {
+          aliveEnemies.splice(i, 1);
+        }
+      }
     }
 
-    const isCrit = this.didCrit(attacker, 'character');
-    let damage = attacker.dmg;
-    if (isCrit) damage *= 2;
-
-    defender.takeDamage(damage);
-
-    logs.push({
-      who: DialoguerType.PLAYER,
-      message: this.getAttackMessage(defender, damage, isCrit),
-    });
-  }
-
-  private executeEnemyAttackTurn(
-    attacker: Enemy,
-    defender: Character,
-    logs: FightReportLog[],
-  ): void {
-    if (this.didEvade(defender)) {
-      logs.push({
-        who: DialoguerType.ENEMY,
-        message: this.getEvadeMessage(defender),
-        enemyName: attacker.name,
-      });
-      return;
-    }
-
-    const isCrit = this.didCrit(attacker, 'enemy');
-    let damage = attacker.dmg;
-    if (isCrit) damage *= 2;
-
-    defender.hp = Math.max(0, defender.hp - damage);
-
-    logs.push({
-      who: DialoguerType.ENEMY,
-      message: this.getAttackMessage(defender, damage, isCrit),
-      enemyName: attacker.name,
-    });
-  }
-
-  private getEvadeMessage(defender: Character | Enemy): string {
-    return GameManager.getMessage<CombatEvadeMessageText>('COMBAT_EVADE', {
-      defenderName: defender.name,
-    });
-  }
-
-  private getAttackMessage(
-    defender: Character | Enemy,
-    damage: number,
-    isCrit: boolean,
-  ): string {
-    if (isCrit) {
-      return GameManager.getMessage<CombatAttackCritMessageText>(
-        'COMBAT_ATTACK_CRIT',
-        {
-          defenderName: defender.name,
-          dmg: damage,
-          hp: defender.hp,
-        },
-      );
-    }
-
-    return GameManager.getMessage<CombatAttackMessageText>('COMBAT_ATTACK', {
-      defenderName: defender.name,
-      dmg: damage,
-      hp: defender.hp,
-    });
+    return isEnabled;
   }
 
   private updateMessageTurn(turn: number, logs: FightReportLog[]): void {
@@ -180,20 +138,6 @@ export class CharacterFightHandler
         turn,
       }),
     });
-  }
-
-  private didEvade(target: Character | Enemy): boolean {
-    const eva = target.eva / 100;
-    return Math.random() < eva;
-  }
-
-  private didCrit(attacker: Character | Enemy, type: Owner): boolean {
-    const ctr =
-      type === 'enemy'
-        ? (attacker as Enemy).ctr / 100
-        : (attacker as Character).ctr / 100;
-
-    return Math.random() < ctr;
   }
 
   private buildFightReport(

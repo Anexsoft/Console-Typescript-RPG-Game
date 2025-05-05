@@ -1,5 +1,6 @@
 import { Character } from '@game/character';
 
+import { CriticalHandler } from '@game/common/handlers/critical.handler';
 import { Handler } from '@game/common/interfaces/handler.interfacer';
 
 import {
@@ -16,6 +17,8 @@ export type SpecialPowerIsAvailableHandlerInput = {
 export class SpecialPowerIsAvailableHandler
   implements Handler<SpecialPowerIsAvailableHandlerInput, void>
 {
+  private readonly criticalHandler = new CriticalHandler();
+
   handle({
     character,
     specialPower,
