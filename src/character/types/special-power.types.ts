@@ -8,12 +8,18 @@ export type CharacterSpecialMultiplierPowerEffect = {
   damageMultiplier: number;
 };
 
+export type CharacterSpecialMultipleHitsPowerEffect = {
+  minHits: number;
+  maxHits: number;
+};
+
 export type CharacterSpecialEnemyLifePowerEffect = {
   minDamagePercent: number;
   baseDamage: number;
 };
 
 export type CharacterSpecialPowerData<EffectType> = {
+  price: number;
   mp: number;
   cooldownTurns: number;
   description: string;
@@ -23,5 +29,5 @@ export type CharacterSpecialPowerData<EffectType> = {
 export type CharacterSpecialPowerCosts = {
   [CharacterSpecialPower.DRAGONS_BREATH]: CharacterSpecialPowerData<CharacterSpecialEnemyLifePowerEffect>;
   [CharacterSpecialPower.SLASH_ATTACK]: CharacterSpecialPowerData<CharacterSpecialMultiplierPowerEffect>;
-  [CharacterSpecialPower.PIERCING_STRIKE]: CharacterSpecialPowerData<CharacterSpecialMultiplierPowerEffect>;
+  [CharacterSpecialPower.PIERCING_STRIKE]: CharacterSpecialPowerData<CharacterSpecialMultipleHitsPowerEffect>;
 };

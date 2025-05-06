@@ -5,17 +5,19 @@ import {
 
 export const CHARACTER_SPECIAL_POWER_COSTS: CharacterSpecialPowerCosts = {
   [CharacterSpecialPower.DRAGONS_BREATH]: {
-    mp: 30,
+    price: 600,
+    mp: 25,
     cooldownTurns: 4,
     description:
       'Unleashes a lethal inferno that burns all enemies, dealing the greater of 25% of their current HP or 100 base damage.',
     effect: {
-      minDamagePercent: 0.25,
-      baseDamage: 100,
+      minDamagePercent: 0.35,
+      baseDamage: 250,
     },
   },
   [CharacterSpecialPower.SLASH_ATTACK]: {
-    mp: 5,
+    price: 250,
+    mp: 10,
     cooldownTurns: 3,
     description: 'Deals % damage to all enemies',
     effect: {
@@ -23,12 +25,14 @@ export const CHARACTER_SPECIAL_POWER_COSTS: CharacterSpecialPowerCosts = {
     },
   },
   [CharacterSpecialPower.PIERCING_STRIKE]: {
-    mp: 7,
+    price: 100,
+    mp: 15,
     cooldownTurns: 2,
     description:
-      'A precise strike that deals double damage and cannot be evaded.',
+      'a flurry of strikes that hits multiple times. Always hits at least twice, with a chance to land more.',
     effect: {
-      damageMultiplier: 2.0,
+      minHits: 2,
+      maxHits: 4,
     },
   },
 };

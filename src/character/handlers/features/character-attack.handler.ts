@@ -63,6 +63,7 @@ export class CharacterAttackHandler
           defenderName: defender.name,
           dmg: damage,
           hp: defender.hp,
+          maxHp: defender.maxHp,
         },
       );
     }
@@ -71,6 +72,7 @@ export class CharacterAttackHandler
       defenderName: defender.name,
       dmg: damage,
       hp: defender.hp,
+      maxHp: defender.maxHp,
     });
   }
 

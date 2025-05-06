@@ -9,6 +9,7 @@ import {
   EVA_PER_DEX,
   HP_PER_VIT,
   MP_PER_INT,
+  RES_PER_LEVEL,
 } from '@game/engine/constants/character';
 
 import { Character } from '..';
@@ -24,5 +25,7 @@ export class CharacterUpgradeHandler implements Handler<Character, void> {
 
     character.hp = Math.round(character.maxHp);
     character.mp = Math.round(character.maxMp);
+
+    character.res = character.level * RES_PER_LEVEL;
   }
 }

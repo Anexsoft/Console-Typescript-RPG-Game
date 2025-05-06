@@ -7,9 +7,9 @@ export const GAME_TEXTS = {
   COMBAT_EVADE:
     'tries to strike, but [c:magenta]{{defenderName}}[/] swiftly dodges the attack',
   COMBAT_ATTACK:
-    'attacks [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]. Remaining HP: [c:grey]{{hp}}[/]',
+    'attacks [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]. Remaining HP: [c:grey]{{hp}}[/]/{{maxHp}}',
   COMBAT_ATTACK_CRIT:
-    'lands a [c:red]critical hit[/] on [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]! Remaining HP: [c:grey]{{hp}}[/]',
+    'lands a [c:red]critical hit[/] on [c:magenta]{{defenderName}}[/], dealing [c:red]{{dmg}} damage[/]! Remaining HP: [c:grey]{{hp}}[/]/{{maxHp}}',
   COMBAT_WIN:
     'you defeated the enemy and earned [c:green]{{expPointsEarned}} experience points[/]!',
   COMBAT_WIN_GOLD:
@@ -30,17 +30,17 @@ export const GAME_TEXTS = {
     'unleashes a devastating [c:yellow]CRITICAL Slash Attack[/], hitting all enemies with [c:red]{{dmg}} damage[/] each!',
 
   SPECIAL_POWER_PIERCING_STRIKE:
-    'uses [c:yellow]Piercing Strike[/] and deals [c:red]{{dmg}} damage[/] to [c:magenta]{{enemyName}}[/]!. Remaining HP: [c:grey]{{hp}}[/]',
+    'uses [c:yellow]Piercing Strike[/] and hits [c:magenta]{{hits}}[/] times, dealing [c:red]{{dmg}} damage[/] to [c:magenta]{{enemyName}}[/]! Remaining HP: [c:grey]{{hp}}[/]/{{maxHp}}',
   SPECIAL_POWER_CRITICAL_PIERCING_STRIKE:
-    'uses a deadly [c:yellow]CRITICAL Piercing Strike[/], inflicting [c:red]{{dmg}} damage[/] on [c:magenta]{{enemyName}}[/]!. Remaining HP: [c:grey]{{hp}}[/]',
+    'unleashes a deadly [c:yellow]CRITICAL Piercing Strike[/], hitting [c:magenta]{{hits}}[/] times and inflicting [c:red]{{dmg}} damage[/] on [c:magenta]{{enemyName}}[/]! Remaining HP: [c:grey]{{hp}}[/]/{{maxHp}}',
 
   /* CHARACTER */
   CHARACTER_CURRENT_STATUS:
-    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',
+    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, RES: {{res}}%, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',
   CHARACTER_CURRENT_GOLD:
     'you currently carry [c:yellow]{{gold}} gold coins[/]',
   CHARACTER_LEVEL_UP_PENDING:
-    'you need [c:cyan]{{pendingExperience}} experience points[/] to reach [c:green]level {{newLevel}}[/]',
+    'you need [c:grey]{{pendingExperience}} experience points[/] to reach [c:green]level {{newLevel}}[/]',
   CHARACTER_NEW_LEVEL_REACHED:
     '🎉 you leveled up! You are now [c:green]level {{newLevel}}[/]!',
   CHARACTER_MAX_LEVEL_REACHED:
@@ -68,6 +68,16 @@ export const GAME_TEXTS = {
 
   /* SCENE > TOWN > INN */
   TOWN_INN_RESTED: 'you slept peacefully and feel [c:green]fully restored[/]',
+
+  /* SCENE > TOWN > STORE */
+  TOWN_STORE_CLOSE:
+    'the store is currently closed. You have already acquired all available powers.',
+  TOWN_STORE_PURCHASE:
+    'welcome! Choose a special power to aid you in your upcoming battles.',
+  TOWN_STORE_PURCHASE_ENOUGH_MONEY:
+    'you dont have [c:grey]enough gold[/] to purchase this power',
+  TOWN_STORE_PURCHASE_SUCCESFUL:
+    'you have [c:green]successfully[/] purchased a new special power!',
 
   /* SCENE > COMBAT */
   COMBAT_ENTERING_MESSAGE:

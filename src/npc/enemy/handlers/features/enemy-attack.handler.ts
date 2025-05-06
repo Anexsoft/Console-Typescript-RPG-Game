@@ -46,14 +46,16 @@ export class EnemyAttackHandler
       dmg: attacker.dmg,
     });
 
+    const finalDamage = Math.round(damage * (1 - defender.res / 100));
+
     this.characterReceiveDamageHandler.handle({
       character: defender,
-      dmg: damage,
+      dmg: finalDamage,
     });
 
     logs.push({
       who: DialoguerType.ENEMY,
-      message: this.getAttackMessage(defender, damage, isCritical),
+      message: this.getAttackMessage(defender, finalDamage, isCritical),
       enemyName: attacker.name,
     });
   }
@@ -70,6 +72,7 @@ export class EnemyAttackHandler
           defenderName: defender.name,
           dmg: damage,
           hp: defender.hp,
+          maxHp: defender.maxHp,
         },
       );
     }
@@ -78,6 +81,7 @@ export class EnemyAttackHandler
       defenderName: defender.name,
       dmg: damage,
       hp: defender.hp,
+      maxHp: defender.maxHp,
     });
   }
 

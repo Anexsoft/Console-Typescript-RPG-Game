@@ -60,19 +60,7 @@ export class CharacterScene implements SceneHandler {
       message: 'what would you like to review or change?',
       options: {
         type: 'list',
-        choices: [
-          { name: 'View Status', value: CharacterSceneAction.STATUS },
-          {
-            name: 'Level Progress',
-            value: CharacterSceneAction.LEVEL_PROGRESS,
-          },
-          { name: 'View Gold', value: CharacterSceneAction.GOLD },
-          {
-            name: 'Set Default Special Power',
-            value: CharacterSceneAction.SPECIAL_POWERS,
-          },
-          { name: 'Return to Town', value: CharacterSceneAction.EXIT },
-        ],
+        choices: this.getChoices(),
       },
     });
 
@@ -81,6 +69,30 @@ export class CharacterScene implements SceneHandler {
     } else {
       await this.executeAction(action);
     }
+  }
+
+  private getChoices(): { name: string; value: number }[] {
+    const choices = [
+      { name: 'View Status', value: CharacterSceneAction.STATUS },
+      {
+        name: 'Level Progress',
+        value: CharacterSceneAction.LEVEL_PROGRESS,
+      },
+      { name: 'View Gold', value: CharacterSceneAction.GOLD },
+      {
+        name: 'Set Default Special Power',
+        value: CharacterSceneAction.SPECIAL_POWERS,
+      },
+      { name: 'Return to Town', value: CharacterSceneAction.EXIT },
+    ];
+
+    const character = GameState.character;
+
+    return choices.filter(
+      (choice) =>
+        choice.value !== CharacterSceneAction.SPECIAL_POWERS ||
+        character.specialPowers.length,
+    );
   }
 
   private async showStatus(): Promise<void> {
@@ -147,7 +159,7 @@ export class CharacterScene implements SceneHandler {
 
   private async updateDefaultSpecialPower(): Promise<void> {
     const character = GameState.character;
-    const powers = Object.values(CharacterSpecialPower);
+    const powers = character.specialPowers;
 
     const newPower = await Dialoguer.send<CharacterSpecialPower>({
       who: DialoguerType.PLAYER,

@@ -17,12 +17,14 @@ export type CombatAttackMessageText = {
   defenderName: string;
   dmg: number;
   hp: number;
+  maxHp: number;
 };
 
 export type CombatAttackCritMessageText = {
   defenderName: string;
   dmg: number;
   hp: number;
+  maxHp: number;
 };
 
 export type CombatWinMessageText = {
@@ -62,12 +64,16 @@ export type SpecialPowerPiercingStrikeMessageText = {
   enemyName: string;
   dmg: number;
   hp: number;
+  maxHp: number;
+  hits: number;
 };
 
 export type SpecialPowerCriticalPiercingStrikeMessageText = {
   enemyName: string;
   dmg: number;
   hp: number;
+  maxHp: number;
+  hits: number;
 };
 
 /* CHARACTER */
@@ -75,6 +81,7 @@ export type CharacterCurrentStatusMessageText = {
   level: number;
   hp: number;
   mp: number;
+  res: number;
   eva: number;
   ctr: number;
   exp: number;

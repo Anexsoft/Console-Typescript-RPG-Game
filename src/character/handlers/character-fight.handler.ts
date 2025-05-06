@@ -107,6 +107,10 @@ export class CharacterFightHandler
     currentTurn: number,
     logs: FightReportLog[],
   ): boolean {
+    if (!character.specialPower) {
+      return false;
+    }
+
     const isEnabled = this.isSpecialPowerAvailable.handle({
       character,
       specialPower: character.specialPower,

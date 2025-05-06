@@ -34,42 +34,66 @@ export class PiercingStrikeHandler
 
     character.mp -= powerData.mp;
 
-    const { isCritical, damage } = this.criticalHandler.handle({
-      ctr: character.ctr,
-      dmg: character.dmg,
-    });
+    const { minHits, maxHits } = powerData.effect;
 
-    const finalDamage = Math.floor(
-      damage * (powerData.effect.damageMultiplier || 1),
-    );
+    const totalHits = this.getWeightedHitCount(minHits, maxHits);
+    let totalDamage = 0;
+    let anyCritical = false;
 
-    enemy.takeDamage(finalDamage);
-
-    if (isCritical) {
-      logs.push({
-        who: DialoguerType.PLAYER,
-        message:
-          GameManager.getMessage<SpecialPowerCriticalPiercingStrikeMessageText>(
-            'SPECIAL_POWER_CRITICAL_PIERCING_STRIKE',
-            {
-              enemyName: enemy.name,
-              dmg: finalDamage,
-              hp: enemy.hp,
-            },
-          ),
+    for (let i = 0; i < totalHits; i++) {
+      const { isCritical, damage } = this.criticalHandler.handle({
+        ctr: character.ctr,
+        dmg: character.dmg,
       });
-    } else {
-      logs.push({
-        who: DialoguerType.PLAYER,
-        message: GameManager.getMessage<SpecialPowerPiercingStrikeMessageText>(
-          'SPECIAL_POWER_PIERCING_STRIKE',
-          {
-            enemyName: enemy.name,
-            dmg: finalDamage,
-            hp: enemy.hp,
-          },
-        ),
-      });
+
+      const hitDamage = Math.floor(damage);
+
+      enemy.takeDamage(hitDamage);
+      totalDamage += hitDamage;
+
+      if (isCritical) {
+        anyCritical = true;
+      }
     }
+
+    const messageKey = anyCritical
+      ? 'SPECIAL_POWER_CRITICAL_PIERCING_STRIKE'
+      : 'SPECIAL_POWER_PIERCING_STRIKE';
+
+    logs.push({
+      who: DialoguerType.PLAYER,
+      message: GameManager.getMessage<
+        | SpecialPowerCriticalPiercingStrikeMessageText
+        | SpecialPowerPiercingStrikeMessageText
+      >(messageKey, {
+        enemyName: enemy.name,
+        dmg: totalDamage,
+        hp: enemy.hp,
+        maxHp: enemy.maxHp,
+        hits: totalHits,
+      }),
+    });
+  }
+
+  private getWeightedHitCount(min: number, max: number): number {
+    const weights: number[] = [];
+
+    for (let i = min; i <= max; i++) {
+      const weight = 1 / (i - min + 1);
+      weights.push(weight);
+    }
+
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    const rand = Math.random() * totalWeight;
+
+    let acc = 0;
+    for (let i = 0; i < weights.length; i++) {
+      acc += weights[i];
+      if (rand <= acc) {
+        return min + i;
+      }
+    }
+
+    return max;
   }
 }

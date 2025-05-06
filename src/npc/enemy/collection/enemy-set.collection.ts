@@ -41,6 +41,7 @@ export const ENEMY_SET = {
   ],
   [EnemyLocation.DRAGON_PEAK]: [
     [EnemyType.LICH, EnemyType.LICH, EnemyType.DARK_KNIGHT],
-    [EnemyType.DRAGON, EnemyType.LICH, EnemyType.LICH],
+    [EnemyType.DRAGON, EnemyType.LICH],
+    [EnemyType.DRAGON, EnemyType.DARK_KNIGHT, EnemyType.LICH],
   ],
 };

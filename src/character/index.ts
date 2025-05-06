@@ -53,10 +53,17 @@ export class Character {
   /** Critical rate – chance to land a critical hit, based on luck (as a proportion). */
   ctr: number = 0;
 
+  /** Resistance rate – resistance bonus gained per level */
+  res: number = 0;
+
   /** Physical damage – calculated from strength (STR). */
   dmg: number = 0;
 
-  specialPower: CharacterSpecialPower;
+  /** Special Power - default selected power to be use in combat. */
+  specialPower?: CharacterSpecialPower = null;
+
+  /** Special Power - available special powers to be used in combant. */
+  specialPowers: CharacterSpecialPower[] = [];
 
   constructor(name: string) {
     this.name = name;
