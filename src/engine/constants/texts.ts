@@ -20,9 +20,7 @@ export const GAME_TEXTS = {
 
   /* SPECIAL POWERS */
   SPECIAL_POWER_DRAGONS_BREATH:
-    "unleashes the lethal [c:yellow]Dragon's Breath[/], incinerating all enemies for [c:red]{{dmg}} damage[/] each!",
-  SPECIAL_POWER_CRITICAL_DRAGONS_BREATH:
-    "[c:yellow]CRITICAL Dragon's Breath[/] engulfs all enemies in flames, dealing a devastating [c:red]{{dmg}} damage[/] each!",
+    "unleashes the lethal [c:yellow]Dragon's Breath[/], scorching all enemies for up to [c:red]{{maxDmg}} damage[/]!",
 
   SPECIAL_POWER_SLASH_ATTACK:
     'unleashes [c:yellow]Slash Attack[/] on all enemies, dealing [c:red]{{dmg}} damage[/] each!',

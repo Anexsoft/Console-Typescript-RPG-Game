@@ -28,13 +28,19 @@ export class DragonsBreathHandler
 
     character.mp -= powerData.mp;
 
+    const damages = [];
+
     enemies.forEach((enemy) => {
       const percentDamage = Math.floor(
         enemy.hp * powerData.effect.minDamagePercent,
       );
-      const finalDamage = Math.max(percentDamage, powerData.effect.baseDamage);
+
+      const finalDamage =
+        Math.max(percentDamage, powerData.effect.baseDamage) +
+        character.dmg * 0.7;
 
       enemy.takeDamage(finalDamage);
+      damages.push(finalDamage);
     });
 
     logs.push({
@@ -42,7 +48,7 @@ export class DragonsBreathHandler
       message: GameManager.getMessage<SpecialPowerDragonsBreathMessageText>(
         'SPECIAL_POWER_DRAGONS_BREATH',
         {
-          dmg: powerData.effect.baseDamage,
+          maxDmg: Math.max(...damages),
         },
       ),
     });

@@ -45,7 +45,7 @@ export type CombatTurnMessageText = {
 
 /* SPECIAL POWERS */
 export type SpecialPowerDragonsBreathMessageText = {
-  dmg: number;
+  maxDmg: number;
 };
 
 export type SpecialPowerCriticalDragonsBreathMessageText = {
