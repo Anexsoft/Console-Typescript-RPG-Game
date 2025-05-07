@@ -97,13 +97,11 @@ export class Dialoguer {
       case DialoguerType.GAME:
         return chalk.bold(chalk.magentaBright(label));
       case DialoguerType.PLAYER:
-        return chalk.bold(
-          chalk.cyanBright(nameOverride ?? GameState.character.name ?? label),
-        );
+        return chalk.bold(chalk.cyanBright(GameState.character.name));
       case DialoguerType.ENEMY:
         return chalk.bold(chalk.redBright(nameOverride ?? label));
       default:
-        return chalk.bold(chalk.white(label));
+        throw new Error('Invalid type supplied');
     }
   }
 

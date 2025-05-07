@@ -34,29 +34,23 @@ export class PiercingStrikeHandler
 
     character.mp -= powerData.mp;
 
-    const { minHits, maxHits } = powerData.effect;
-
+    const { minHits, maxHits, damageMultiplier } = powerData.effect;
     const totalHits = this.getWeightedHitCount(minHits, maxHits);
-    let totalDamage = 0;
-    let anyCritical = false;
+
+    const { isCritical, damage } = this.criticalHandler.handle({
+      ctr: character.ctr,
+      dmg: character.dmg,
+    });
+
+    let finalDamage = damage;
 
     for (let i = 0; i < totalHits; i++) {
-      const { isCritical, damage } = this.criticalHandler.handle({
-        ctr: character.ctr,
-        dmg: character.dmg,
-      });
-
-      const hitDamage = Math.floor(damage);
-
-      enemy.takeDamage(hitDamage);
-      totalDamage += hitDamage;
-
-      if (isCritical) {
-        anyCritical = true;
-      }
+      finalDamage += Math.floor(damage * damageMultiplier);
     }
 
-    const messageKey = anyCritical
+    enemy.takeDamage(finalDamage);
+
+    const messageKey = isCritical
       ? 'SPECIAL_POWER_CRITICAL_PIERCING_STRIKE'
       : 'SPECIAL_POWER_PIERCING_STRIKE';
 
@@ -67,7 +61,7 @@ export class PiercingStrikeHandler
         | SpecialPowerPiercingStrikeMessageText
       >(messageKey, {
         enemyName: enemy.name,
-        dmg: totalDamage,
+        dmg: finalDamage,
         hp: enemy.hp,
         maxHp: enemy.maxHp,
         hits: totalHits,

@@ -34,7 +34,7 @@ export const GAME_TEXTS = {
 
   /* CHARACTER */
   CHARACTER_CURRENT_STATUS:
-    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, RES: {{res}}%, EVA: {{eva}}%, CTR: {{ctr}}%, EXP: {{exp}}',
+    'level: {{level}} - HP: {{hp}}, MP: {{mp}}, DMG: {{dmg}}, RES: {{res}}%, EVA: {{eva}}%, CTR: {{ctr}}%',
   CHARACTER_CURRENT_GOLD:
     'you currently carry [c:yellow]{{gold}} gold coins[/]',
   CHARACTER_LEVEL_UP_PENDING:

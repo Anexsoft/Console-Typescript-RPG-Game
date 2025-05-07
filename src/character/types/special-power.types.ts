@@ -11,6 +11,7 @@ export type CharacterSpecialMultiplierPowerEffect = {
 export type CharacterSpecialMultipleHitsPowerEffect = {
   minHits: number;
   maxHits: number;
+  damageMultiplier: number;
 };
 
 export type CharacterSpecialEnemyLifePowerEffect = {

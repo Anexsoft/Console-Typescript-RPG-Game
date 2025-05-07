@@ -32,7 +32,8 @@ export const CHARACTER_SPECIAL_POWER_COSTS: CharacterSpecialPowerCosts = {
       'a flurry of strikes that hits multiple times. Always hits at least twice, with a chance to land more.',
     effect: {
       minHits: 2,
-      maxHits: 4,
+      maxHits: 7,
+      damageMultiplier: 0.25,
     },
   },
 };
