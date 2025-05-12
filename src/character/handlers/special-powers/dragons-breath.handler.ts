@@ -35,9 +35,10 @@ export class DragonsBreathHandler
         enemy.hp * powerData.effect.minDamagePercent,
       );
 
-      const finalDamage =
+      const finalDamage = Math.round(
         Math.max(percentDamage, powerData.effect.baseDamage) +
-        character.dmg * 0.7;
+          character.dmg * 0.7,
+      );
 
       enemy.takeDamage(finalDamage);
       damages.push(finalDamage);

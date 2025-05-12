@@ -54,37 +54,30 @@ export class CharacterFightHandler
 
   handle({ character, enemies }: CharacterFightHandlerInput): FightReport {
     const logs: FightReportLog[] = [];
-    const aliveEnemies = [...enemies];
 
     let currentTurn = 1;
 
-    while (character.hp > 0 && aliveEnemies.length > 0) {
+    while (character.hp > 0 && enemies.some((enemy) => enemy.isAlive())) {
       this.updateMessageTurn(currentTurn, logs);
-
-      aliveEnemies.sort((a, b) => a.hp - b.hp);
-      const targetEnemy = aliveEnemies[0];
+      this.sortByLowestHpFirst(enemies);
 
       if (
-        !this.tryToExecuteCharacterSpecialAttackTurn(
+        this.isSpecialPowerAvailable.handle({
           character,
-          enemies,
-          aliveEnemies,
+          specialPower: character.specialPower,
           currentTurn,
-          logs,
-        )
+        })
       ) {
+        this.executeCharacterSpecialAttackTurn(character, enemies, logs);
+      } else {
         this.characterAttackHandler.handle({
           attacker: character,
-          defender: targetEnemy,
+          defender: enemies[0],
           logs,
         });
-
-        if (!targetEnemy.isAlive()) {
-          aliveEnemies.shift();
-        }
       }
 
-      for (const enemy of aliveEnemies) {
+      for (const enemy of enemies.filter((enemy) => enemy.isAlive())) {
         if (character.hp > 0) {
           this.enemyAttackHandler.handle({
             attacker: enemy,
@@ -100,56 +93,44 @@ export class CharacterFightHandler
     return this.buildFightReport(character, enemies, logs);
   }
 
-  private tryToExecuteCharacterSpecialAttackTurn(
+  private sortByLowestHpFirst(enemies: Enemy[]): void {
+    enemies.sort((a, b) => {
+      const aDead = a.hp <= 0 ? 1 : 0;
+      const bDead = b.hp <= 0 ? 1 : 0;
+
+      if (aDead !== bDead) return aDead - bDead;
+      return a.hp - b.hp;
+    });
+  }
+
+  private executeCharacterSpecialAttackTurn(
     character: Character,
     enemies: Enemy[],
-    aliveEnemies: Enemy[],
-    currentTurn: number,
     logs: FightReportLog[],
-  ): boolean {
-    if (!character.specialPower) {
-      return false;
+  ): void {
+    if (character.specialPower === CharacterSpecialPower.DRAGONS_BREATH) {
+      this.specialPowers[CharacterSpecialPower.DRAGONS_BREATH].handle({
+        character,
+        enemies,
+        logs,
+      });
     }
 
-    const isEnabled = this.isSpecialPowerAvailable.handle({
-      character,
-      specialPower: character.specialPower,
-      currentTurn,
-    });
-
-    if (isEnabled) {
-      if (character.specialPower === CharacterSpecialPower.DRAGONS_BREATH) {
-        this.specialPowers[CharacterSpecialPower.DRAGONS_BREATH].handle({
-          character,
-          enemies,
-          logs,
-        });
-      }
-
-      if (character.specialPower === CharacterSpecialPower.SLASH_ATTACK) {
-        this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
-          character,
-          enemies,
-          logs,
-        });
-      }
-
-      if (character.specialPower === CharacterSpecialPower.PIERCING_STRIKE) {
-        this.specialPowers[CharacterSpecialPower.PIERCING_STRIKE].handle({
-          character,
-          enemy: enemies[0],
-          logs,
-        });
-      }
-
-      for (let i = aliveEnemies.length - 1; i >= 0; i--) {
-        if (!aliveEnemies[i].isAlive()) {
-          aliveEnemies.splice(i, 1);
-        }
-      }
+    if (character.specialPower === CharacterSpecialPower.SLASH_ATTACK) {
+      this.specialPowers[CharacterSpecialPower.SLASH_ATTACK].handle({
+        character,
+        enemies,
+        logs,
+      });
     }
 
-    return isEnabled;
+    if (character.specialPower === CharacterSpecialPower.PIERCING_STRIKE) {
+      this.specialPowers[CharacterSpecialPower.PIERCING_STRIKE].handle({
+        character,
+        enemy: enemies[0],
+        logs,
+      });
+    }
   }
 
   private updateMessageTurn(turn: number, logs: FightReportLog[]): void {
